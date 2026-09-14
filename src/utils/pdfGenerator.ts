@@ -66,17 +66,25 @@ function drawGradientRect(
 }
 
 function drawRefurbiLogo(pdf: jsPDF, x: number, y: number, size: number) {
-  const circleSize = size * 0.4;
-  const offset = size * 0.22;
+  // Logo oficial Refurbi: 3 círculos superpuestos con centros huecos
+  const circleRadius = size * 0.35;
+  const offset = size * 0.28;
   
   pdf.setFillColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-  setOpacity(pdf, 0.9);
+  setOpacity(pdf, 0.85);
   
-  pdf.circle(x + circleSize, y + size / 2, circleSize, 'F');
-  pdf.circle(x + circleSize + offset, y + size / 2, circleSize, 'F');
-  pdf.circle(x + circleSize + offset * 2, y + size / 2, circleSize, 'F');
+  // Dibujar 3 círculos superpuestos
+  pdf.circle(x + circleRadius, y + size / 2, circleRadius, 'F');
+  pdf.circle(x + circleRadius + offset, y + size / 2, circleRadius, 'F');
+  pdf.circle(x + circleRadius + offset * 2, y + size / 2, circleRadius, 'F');
   
+  // Crear los centros huecos (efecto Venn)
+  pdf.setFillColor(255, 255, 255);
   setOpacity(pdf, 1);
+  const innerRadius = circleRadius * 0.45;
+  pdf.circle(x + circleRadius, y + size / 2, innerRadius, 'F');
+  pdf.circle(x + circleRadius + offset, y + size / 2, innerRadius, 'F');
+  pdf.circle(x + circleRadius + offset * 2, y + size / 2, innerRadius, 'F');
 }
 
 function drawSectionTitle(
@@ -120,18 +128,18 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
 
   // Logo de Refurbi + Título al mismo nivel del QR (izquierda)
   const titleY = 8; // Mismo nivel vertical que el QR
-  drawRefurbiLogo(pdf, margin + 2, titleY - 1, 7);
+  drawRefurbiLogo(pdf, margin + 2, titleY - 1, 12); // Aumentado de 7 a 12
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('REFURBI', margin + 12, titleY + 4);
+  pdf.text('REFURBI', margin + 16, titleY + 4);
   
   // Título al mismo nivel del QR
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 10);
+  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 12);
 
   // Canal/MKP y Fecha en la misma línea
   const mkpY = titleY + 15;

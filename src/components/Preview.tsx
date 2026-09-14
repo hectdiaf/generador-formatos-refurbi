@@ -152,13 +152,13 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 <div className="flex items-start gap-2">
                   {/* Logo de Refurbi */}
                   <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-1 mb-1">
-                      <div className="flex -space-x-0.5">
-                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <div className="flex -space-x-1">
+                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
+                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
+                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
                       </div>
-                      <p className="text-white font-bold text-[10px] tracking-wide">REFURBI</p>
+                      <p className="text-white font-bold text-[11px] tracking-wide">REFURBI</p>
                     </div>
                     <p className="text-white font-bold text-[9px] tracking-wide">FORMATO DE REMISIÓN DE PEDIDOS</p>
                   </div>
