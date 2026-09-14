@@ -1,7 +1,7 @@
 // ============================================================
 // Generador de PDF - Formato Refurbi
 // Media Carta HORIZONTAL (8.5 x 5.5 pulgadas)
-// Layout redistribuido en 2x2
+// Layout redistribuido con nuevas proporciones
 // ============================================================
 
 import jsPDF from 'jspdf';
@@ -13,7 +13,7 @@ import { generarCodigoBarras } from './barcodeGenerator';
 const PAGE_WIDTH = 215.9;  // 8.5 inches
 const PAGE_HEIGHT = 139.7; // 5.5 inches
 
-// Paleta de colores Refurbi - Tonos azules unificados
+// Paleta de colores Refurbi - Tonos azules unificados (sin grises para impresión)
 const COLORS = {
   brand: [2, 48, 71] as const,
   brandLight: [3, 78, 113] as const,
@@ -25,11 +25,9 @@ const COLORS = {
   accentBg: [224, 242, 254] as const,
   navy: [15, 23, 42] as const,
   slate: [51, 65, 85] as const,
-  slateLight: [100, 116, 139] as const,
-  gray: [148, 163, 184] as const,
-  grayLight: [241, 245, 249] as const,
+  slateLight: [71, 85, 105] as const, // Más oscuro para impresión
   white: [255, 255, 255] as const,
-  border: [191, 219, 254] as const,
+  border: [30, 64, 175] as const, // Borde azul en lugar de gris
 };
 
 function formatCurrency(value: string | number): string {
@@ -111,7 +109,7 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F');
 
   // ============ ENCABEZADO ============
-  const headerHeight = 22;
+  const headerHeight = 24;
   drawGradientRect(pdf, 0, 0, PAGE_WIDTH, headerHeight, COLORS.brand, COLORS.brandLight, 8);
   
   // Elementos decorativos
@@ -132,43 +130,13 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   // Propósito
   pdf.setFont('helvetica', 'italic');
   pdf.setFontSize(5);
-  pdf.setTextColor(180, 210, 225);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.text('Estamos convencidos que las segundas oportunidades no son solo para las personas.', margin + 15, 11.5);
 
-  // Título
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(8);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('Formato de remisión de pedidos', margin + 2, 16);
-
-  // Canal/MKP y Fecha (más grande) debajo del título
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(7);
-  pdf.setTextColor(200, 220, 240);
-  pdf.text(`${pedido.mkp}  |  ${pedido.fecha}`, margin + 2, 20);
-
-  // Número de pedido destacado (lado derecho)
-  const pedidoBoxX = PAGE_WIDTH - margin - 35;
-  
-  pdf.setFillColor(255, 255, 255);
-  setOpacity(pdf, 0.15);
-  pdf.roundedRect(pedidoBoxX - 2, 2, 37, 12, 2, 2, 'F');
-  setOpacity(pdf, 1);
-  
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5);
-  pdf.setTextColor(180, 210, 225);
-  pdf.text('PEDIDO', pedidoBoxX, 6);
-  
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(13);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text(String(pedido.pedido), pedidoBoxX, 12);
-
-  // QR pequeño al lado del número de pedido
-  const qrSize = 10;
-  const qrX = pedidoBoxX - qrSize - 2;
-  const qrY = 3;
+  // QR más grande y centrado a la izquierda
+  const qrSize = 16;
+  const qrX = margin + 2;
+  const qrY = 13;
   
   try {
     const qrDataUrl = await generarQR(pedido.id);
@@ -177,10 +145,71 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     // Placeholder
   }
 
-  // Código de barras Code 128 debajo del número de pedido
-  const barcodeY = 15;
-  const barcodeHeight = 6;
-  const barcodeWidth = 35;
+  // Título más grande al lado derecho de la fecha
+  const titleX = qrX + qrSize + 3;
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(11);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text('Formato de remisión de pedidos', titleX, 18);
+
+  // Canal/MKP con icono de carrito
+  const iconY = 22;
+  pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  // Icono carrito (simplificado)
+  pdf.setLineWidth(0.5);
+  pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.line(titleX, iconY - 1, titleX + 2, iconY - 1);
+  pdf.line(titleX + 0.5, iconY - 1, titleX + 1, iconY + 1);
+  pdf.line(titleX + 1.5, iconY - 1, titleX + 2, iconY + 1);
+  pdf.circle(titleX + 0.8, iconY + 1.5, 0.3, 'F');
+  pdf.circle(titleX + 1.7, iconY + 1.5, 0.3, 'F');
+  
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text(pedido.mkp, titleX + 4, iconY);
+
+  // Fecha con icono de calendario
+  const fechaX = titleX + 4 + pdf.getStringUnitWidth(pedido.mkp) * 8 / pdf.internal.scaleFactor + 3;
+  // Icono calendario (simplificado)
+  pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.setLineWidth(0.4);
+  pdf.rect(fechaX, iconY - 1.5, 3, 3);
+  pdf.line(fechaX, iconY - 0.5, fechaX + 3, iconY - 0.5);
+  pdf.line(fechaX + 0.8, iconY - 2, fechaX + 0.8, iconY - 1.2);
+  pdf.line(fechaX + 2.2, iconY - 2, fechaX + 2.2, iconY - 1.2);
+  
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text(pedido.fecha, fechaX + 4, iconY);
+
+  // Número de pedido destacado (lado derecho)
+  const pedidoBoxX = PAGE_WIDTH - margin - 40;
+  
+  pdf.setFillColor(255, 255, 255);
+  setOpacity(pdf, 0.15);
+  pdf.roundedRect(pedidoBoxX - 2, 2, 42, 14, 2, 2, 'F');
+  setOpacity(pdf, 1);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(6);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text('PEDIDO', pedidoBoxX, 6);
+  
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(14);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text(String(pedido.pedido), pedidoBoxX, 13);
+
+  // Código de barras Code 128 con recuadro blanco
+  const barcodeY = 17;
+  const barcodeHeight = 8;
+  const barcodeWidth = 40;
+  
+  // Recuadro blanco alrededor del código de barras
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(pedidoBoxX - 1, barcodeY - 1, barcodeWidth + 2, barcodeHeight + 2, 'F');
   
   try {
     const barcodeDataUrl = await generarCodigoBarras(String(pedido.pedido));
@@ -189,97 +218,100 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     }
   } catch (e) {
     // Si falla, dibujar placeholder
-    pdf.setDrawColor(255, 255, 255);
+    pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
     pdf.setLineWidth(0.3);
     pdf.rect(pedidoBoxX, barcodeY, barcodeWidth, barcodeHeight);
   }
 
   currentY = headerHeight + 2;
 
-  // ============ LAYOUT EN 2x2 ============
-  const halfWidth = (contentWidth - 2) / 2; // 2mm de gap central
-  const leftX = margin;
-  const rightX = margin + halfWidth + 2;
+  // ============ LAYOUT EN 2x2 CON NUEVAS PROPORCIONES ============
+  // Fila superior: 30% datos cliente, 70% detalle producto
+  const clientWidth = contentWidth * 0.30;
+  const productWidth = contentWidth * 0.70 - 2; // 2mm gap
   
+  // Fila inferior: 40% detalles pedido, 60% diligenciamiento
+  const detailsWidth = contentWidth * 0.40;
+  const operativeWidth = contentWidth * 0.60 - 2; // 2mm gap
+  
+  const clientX = margin;
+  const productX = margin + clientWidth + 2;
+  const detailsX = margin;
+  const operativeX = margin + detailsWidth + 2;
+
   // Calcular alturas disponibles
-  const topSectionHeight = 55; // Altura para las secciones superiores
-  const bottomSectionHeight = PAGE_HEIGHT - currentY - topSectionHeight - margin - 3;
-  
-  const topY = currentY;
+  const topSectionHeight = 55;
   const bottomY = currentY + topSectionHeight + 2;
 
-  // ============ ARRIBA IZQUIERDA: DATOS DEL CLIENTE ============
-  drawSectionTitle(pdf, leftX, topY, 'DATOS DEL CLIENTE', COLORS.blue, COLORS.blueBg, halfWidth);
-  let dataY = topY + 8;
+  // ============ ARRIBA IZQUIERDA: DATOS DEL CLIENTE (30%) ============
+  drawSectionTitle(pdf, clientX, currentY, 'DATOS DEL CLIENTE', COLORS.blue, COLORS.blueBg, clientWidth);
+  let dataY = currentY + 8;
 
-  // Datos en columna vertical
   const dataBoxHeight = 10;
   
   // Nombre
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX, dataY, halfWidth, dataBoxHeight, 1.5, 1.5, 'F');
-  pdf.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
+  pdf.roundedRect(clientX, dataY, clientWidth, dataBoxHeight, 1.5, 1.5, 'F');
+  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.setLineWidth(0.3);
-  pdf.roundedRect(leftX, dataY, halfWidth, dataBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(clientX, dataY, clientWidth, dataBoxHeight, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(5.5);
-  pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('NOMBRE', leftX + 2, dataY + 3);
+  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.text('NOMBRE', clientX + 2, dataY + 3);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(7);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(pedido.nombre.toUpperCase().substring(0, 30), leftX + 2, dataY + 7.5);
+  pdf.text(pedido.nombre.toUpperCase().substring(0, 30), clientX + 2, dataY + 7.5);
 
   dataY += dataBoxHeight + 1;
 
   // Cédula y Celular lado a lado
-  const halfDataWidth = (halfWidth - 1) / 2;
+  const halfDataWidth = (clientWidth - 1) / 2;
   
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'F');
-  pdf.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
-  pdf.roundedRect(leftX, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(clientX, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'F');
+  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.roundedRect(clientX, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(5.5);
-  pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('C.C.', leftX + 2, dataY + 3);
+  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.text('C.C.', clientX + 2, dataY + 3);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(7);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(String(pedido.cedula), leftX + 2, dataY + 7.5);
+  pdf.text(String(pedido.cedula), clientX + 2, dataY + 7.5);
 
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX + halfDataWidth + 1, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'F');
-  pdf.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
-  pdf.roundedRect(leftX + halfDataWidth + 1, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(clientX + halfDataWidth + 1, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'F');
+  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.roundedRect(clientX + halfDataWidth + 1, dataY, halfDataWidth, dataBoxHeight, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(5.5);
-  pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('CELULAR', leftX + halfDataWidth + 3, dataY + 3);
+  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.text('CELULAR', clientX + halfDataWidth + 3, dataY + 3);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(7);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(String(pedido.celular), leftX + halfDataWidth + 3, dataY + 7.5);
+  pdf.text(String(pedido.celular), clientX + halfDataWidth + 3, dataY + 7.5);
 
-  // ============ ARRIBA DERECHA: DETALLE DEL PRODUCTO ============
-  drawSectionTitle(pdf, rightX, topY, 'DETALLE DEL PRODUCTO', COLORS.section, COLORS.sectionBg, halfWidth);
-  let tableY = topY + 8;
+  // ============ ARRIBA DERECHA: DETALLE DEL PRODUCTO (70%) ============
+  drawSectionTitle(pdf, productX, currentY, 'DETALLE DEL PRODUCTO', COLORS.section, COLORS.sectionBg, productWidth);
+  let tableY = currentY + 8;
 
-  // Tabla de productos
   const cols = [
-    { label: 'SKU', width: halfWidth * 0.40, align: 'left' as const },
-    { label: 'BASE', width: halfWidth * 0.15, align: 'right' as const },
-    { label: 'PANEL', width: halfWidth * 0.12, align: 'right' as const },
-    { label: 'G.A.I', width: halfWidth * 0.12, align: 'right' as const },
-    { label: 'G.TOT', width: halfWidth * 0.11, align: 'right' as const },
+    { label: 'SKU', width: productWidth * 0.40, align: 'left' as const },
+    { label: 'BASE', width: productWidth * 0.15, align: 'right' as const },
+    { label: 'PANEL', width: productWidth * 0.12, align: 'right' as const },
+    { label: 'G.A.I', width: productWidth * 0.12, align: 'right' as const },
+    { label: 'G.TOT', width: productWidth * 0.11, align: 'right' as const },
   ];
 
-  // Calcular alto de fila dinámico
   const numProductos = pedido.productos.length;
-  const availableTableHeight = topSectionHeight - 10; // espacio disponible para tabla
+  const availableTableHeight = topSectionHeight - 10;
   const headerRowHeight = 6;
   const rowHeight = Math.min(8, Math.max(6, (availableTableHeight - headerRowHeight - 8) / numProductos));
 
@@ -287,13 +319,13 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   const textOffsetY = rowHeight / 2 + 1;
 
   // Encabezados
-  drawGradientRect(pdf, rightX, tableY, halfWidth, headerRowHeight, COLORS.brand, COLORS.brandLight, 6);
+  drawGradientRect(pdf, productX, tableY, productWidth, headerRowHeight, COLORS.brand, COLORS.brandLight, 6);
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(fontSize);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   
-  let colX = rightX;
+  let colX = productX;
   cols.forEach(col => {
     const textW = pdf.getStringUnitWidth(col.label) * fontSize / pdf.internal.scaleFactor;
     const textX = col.align === 'right' ? colX + col.width - textW - 1 : colX + 1;
@@ -305,15 +337,15 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
 
   // Filas
   pedido.productos.forEach((producto, index) => {
-    const bgColor = index % 2 === 0 ? COLORS.white : COLORS.grayLight;
+    const bgColor = index % 2 === 0 ? COLORS.white : COLORS.blueBg;
     pdf.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-    pdf.rect(rightX, tableY, halfWidth, rowHeight, 'F');
+    pdf.rect(productX, tableY, productWidth, rowHeight, 'F');
     
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(fontSize);
     pdf.setTextColor(COLORS.slate[0], COLORS.slate[1], COLORS.slate[2]);
     
-    colX = rightX;
+    colX = productX;
     const values = [
       producto.sku,
       formatCurrency(producto.base),
@@ -347,12 +379,12 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.setLineWidth(0.4);
   const tableStartY = tableY - (pedido.productos.length * rowHeight) - headerRowHeight;
-  pdf.roundedRect(rightX, tableStartY, halfWidth, tableY - tableStartY, 1, 1, 'S');
+  pdf.roundedRect(productX, tableStartY, productWidth, tableY - tableStartY, 1, 1, 'S');
 
   // Total destacado
   tableY += 1;
-  const totalBoxW = halfWidth * 0.6;
-  const totalBoxX = rightX + halfWidth - totalBoxW;
+  const totalBoxW = productWidth * 0.6;
+  const totalBoxX = productX + productWidth - totalBoxW;
   
   drawGradientRect(pdf, totalBoxX, tableY, totalBoxW, 7, COLORS.accent, COLORS.section, 6);
   
@@ -364,126 +396,126 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setFontSize(8);
   pdf.text(formatCurrency(pedido.totalVenta), totalBoxX + 2, tableY + 6.5);
 
-  // ============ ABAJO IZQUIERDA: DETALLES DEL PEDIDO ============
-  drawSectionTitle(pdf, leftX, bottomY, 'DETALLES DEL PEDIDO', COLORS.section, COLORS.sectionBg, halfWidth);
+  // ============ ABAJO IZQUIERDA: DETALLES DEL PEDIDO (40%) ============
+  drawSectionTitle(pdf, detailsX, bottomY, 'DETALLES DEL PEDIDO', COLORS.section, COLORS.sectionBg, detailsWidth);
   let detailY = bottomY + 8;
 
   const detailBoxHeight = 11;
 
   // Pasarela
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX, detailY, halfWidth, detailBoxHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX, detailY, detailsWidth, detailBoxHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(leftX, detailY, halfWidth, detailBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(detailsX, detailY, detailsWidth, detailBoxHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.roundedRect(leftX, detailY, halfWidth, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX, detailY, detailsWidth, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.text('PASARELA', leftX + 2, detailY + 5.5);
+  pdf.text('PASARELA', detailsX + 2, detailY + 5.5);
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(6.5);
   pdf.setTextColor(COLORS.slate[0], COLORS.slate[1], COLORS.slate[2]);
-  pdf.text(pedido.pasarela || '-', leftX + 2, detailY + 9.5);
+  pdf.text(pedido.pasarela || '-', detailsX + 2, detailY + 9.5);
 
   detailY += detailBoxHeight + 1;
 
   // Outlet / Combo
-  const halfDetailWidth = (halfWidth - 1) / 2;
+  const halfDetailWidth = (detailsWidth - 1) / 2;
   
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(leftX, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(detailsX, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.roundedRect(leftX, detailY, halfDetailWidth, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX, detailY, halfDetailWidth, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.text('OUTLET', leftX + 2, detailY + 5.5);
+  pdf.text('OUTLET', detailsX + 2, detailY + 5.5);
   
-  pdf.setDrawColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
+  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(leftX + 2, detailY + 7, 3, 3, 0.5, 0.5, 'S');
+  pdf.roundedRect(detailsX + 2, detailY + 7, 3, 3, 0.5, 0.5, 'S');
   
   if (pedido.outlet) {
     pdf.setFillColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-    pdf.roundedRect(leftX + 2.5, detailY + 7.5, 2, 2, 0.3, 0.3, 'F');
+    pdf.roundedRect(detailsX + 2.5, detailY + 7.5, 2, 2, 0.3, 0.3, 'F');
   }
 
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(leftX + halfDetailWidth + 1, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX + halfDetailWidth + 1, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(leftX + halfDetailWidth + 1, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(detailsX + halfDetailWidth + 1, detailY, halfDetailWidth, detailBoxHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.roundedRect(leftX + halfDetailWidth + 1, detailY, halfDetailWidth, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(detailsX + halfDetailWidth + 1, detailY, halfDetailWidth, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.section[0], COLORS.section[1], COLORS.section[2]);
-  pdf.text('COMBO', leftX + halfDetailWidth + 3, detailY + 5.5);
+  pdf.text('COMBO', detailsX + halfDetailWidth + 3, detailY + 5.5);
   
-  pdf.setDrawColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
+  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(leftX + halfDetailWidth + 3, detailY + 7, 3, 3, 0.5, 0.5, 'S');
+  pdf.roundedRect(detailsX + halfDetailWidth + 3, detailY + 7, 3, 3, 0.5, 0.5, 'S');
 
-  // ============ ABAJO DERECHA: DILIGENCIAMIENTO OPERATIVO ============
-  drawSectionTitle(pdf, rightX, bottomY, 'DILIGENCIAMIENTO OPERATIVO', COLORS.accent, COLORS.accentBg, halfWidth);
+  // ============ ABAJO DERECHA: DILIGENCIAMIENTO OPERATIVO (60%) ============
+  drawSectionTitle(pdf, operativeX, bottomY, 'DILIGENCIAMIENTO OPERATIVO', COLORS.accent, COLORS.accentBg, operativeWidth);
   let opY = bottomY + 8;
 
-  const opWidth = halfWidth / 3;
-  const opHeight = bottomSectionHeight - 10;
+  const opWidth = operativeWidth / 3;
+  const opHeight = PAGE_HEIGHT - opY - margin - 3;
 
   // Factura
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(rightX, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(rightX, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(operativeX, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.roundedRect(rightX, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.text('FACTURA', rightX + 2, opY + 5.5);
+  pdf.text('FACTURA', operativeX + 2, opY + 5.5);
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(5.5);
-  pdf.setTextColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
-  pdf.text('N.________________', rightX + 2, opY + 9);
+  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.text('N.________________', operativeX + 2, opY + 9);
 
   // Observaciones
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(rightX + opWidth, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX + opWidth, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(rightX + opWidth, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(operativeX + opWidth, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.roundedRect(rightX + opWidth, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX + opWidth, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.text('OBSERVACIONES', rightX + opWidth + 2, opY + 5.5);
+  pdf.text('OBSERVACIONES', operativeX + opWidth + 2, opY + 5.5);
 
   // Proceso
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(rightX + opWidth * 2, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX + opWidth * 2, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'F');
   pdf.setDrawColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(rightX + opWidth * 2, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
+  pdf.roundedRect(operativeX + opWidth * 2, opY, opWidth - 0.5, opHeight, 1.5, 1.5, 'S');
   pdf.setFillColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.roundedRect(rightX + opWidth * 2, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
+  pdf.roundedRect(operativeX + opWidth * 2, opY, opWidth - 0.5, 2.5, 1.5, 1.5, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
-  pdf.text('PROCESO', rightX + opWidth * 2 + 2, opY + 5.5);
+  pdf.text('PROCESO', operativeX + opWidth * 2 + 2, opY + 5.5);
 }
 
 export async function generarPDFPedido(pedido: Pedido): Promise<jsPDF> {

@@ -181,9 +181,11 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
               </div>
             </div>
 
-            {/* Layout 2x2 */}
-            <div className="grid grid-cols-2 gap-2 p-2">
-              {/* Arriba Izquierda: Datos del Cliente */}
+            {/* Layout 2x2 con nuevas proporciones */}
+            <div className="p-2 space-y-2">
+              {/* Fila superior: 30% cliente, 70% producto */}
+              <div className="grid gap-2" style={{ gridTemplateColumns: '30% 70%' }}>
+              {/* Arriba Izquierda: Datos del Cliente (30%) */}
               <div>
                 <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-600">
                   <p className="text-blue-700 font-bold text-[9px]">DATOS DEL CLIENTE</p>
@@ -243,7 +245,11 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 </div>
               </div>
 
-              {/* Abajo Izquierda: Detalles del Pedido */}
+              </div>
+
+              {/* Fila inferior: 40% detalles pedido, 60% diligenciamiento */}
+              <div className="grid gap-2" style={{ gridTemplateColumns: '40% 60%' }}>
+              {/* Abajo Izquierda: Detalles del Pedido (40%) */}
               <div>
                 <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-700">
                   <p className="text-blue-800 font-bold text-[9px]">DETALLES DEL PEDIDO</p>
@@ -257,7 +263,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     <div>
                       <p className="text-blue-800 font-bold text-[8px]">OUTLET</p>
                       <div className={`w-3 h-3 border-2 rounded mt-0.5 flex items-center justify-center ${
-                        pedido.outlet ? 'border-[#023047] bg-[#023047]' : 'border-gray-300'
+                        pedido.outlet ? 'border-[#023047] bg-[#023047]' : 'border-blue-700'
                       }`}>
                         {pedido.outlet && (
                           <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,13 +274,13 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     </div>
                     <div>
                       <p className="text-blue-800 font-bold text-[8px]">COMBO</p>
-                      <div className="w-3 h-3 border-2 border-gray-300 rounded mt-0.5"></div>
+                      <div className="w-3 h-3 border-2 border-blue-700 rounded mt-0.5"></div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Abajo Derecha: Diligenciamiento Operativo */}
+              {/* Abajo Derecha: Diligenciamiento Operativo (60%) */}
               <div>
                 <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-500">
                   <p className="text-blue-600 font-bold text-[9px]">DILIGENCIAMIENTO OPERATIVO</p>
@@ -282,7 +288,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 <div className="grid grid-cols-3 gap-1 mt-1">
                   <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
                     <p className="text-blue-600 font-bold text-[8px]">FACTURA</p>
-                    <p className="text-[7px] text-gray-300 mt-0.5">N.____________</p>
+                    <p className="text-[7px] text-blue-700 mt-0.5">N.____________</p>
                   </div>
                   <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
                     <p className="text-blue-600 font-bold text-[8px]">OBSERVACIONES</p>
@@ -291,6 +297,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     <p className="text-blue-600 font-bold text-[8px]">PROCESO</p>
                   </div>
                 </div>
+              </div>
               </div>
             </div>
           </div>
