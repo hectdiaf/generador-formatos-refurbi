@@ -139,10 +139,10 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 16);
+  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 14);
 
   // Canal/MKP y Fecha en la misma línea
-  const mkpY = titleY + 15;
+  const mkpY = titleY + 20;
   
   // Icono carrito (simplificado)
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
