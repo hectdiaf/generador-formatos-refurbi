@@ -163,10 +163,17 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     <span className="bg-white text-[#023047] text-[7px] px-1.5 py-0.5 rounded-full font-bold">Ecommerce / Marketplace</span>
                   </div>
                 </div>
-                <div className="bg-white/15 rounded-lg px-3 py-1 text-right">
-                  <p className="text-blue-200 text-[8px]">PEDIDO</p>
-                  <p className="text-white font-bold text-xl leading-tight">{pedido.pedido}</p>
-                  <p className="text-blue-200 text-[8px]">{pedido.mkp} | {pedido.fecha}</p>
+                <div className="flex items-center gap-2">
+                  {qrImage && (
+                    <div className="bg-white rounded-md p-0.5">
+                      <img src={qrImage} alt="QR" className="w-12 h-12" />
+                    </div>
+                  )}
+                  <div className="bg-white/15 rounded-lg px-3 py-1 text-right">
+                    <p className="text-blue-200 text-[8px]">PEDIDO</p>
+                    <p className="text-white font-bold text-xl leading-tight">{pedido.pedido}</p>
+                    <p className="text-blue-200 text-[8px]">{pedido.mkp} | {pedido.fecha}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,52 +200,42 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
             </div>
 
             {/* Detalle del producto */}
-            <div className="mx-3 mt-2 flex gap-2">
-              <div className="flex-1">
-                <div className="bg-orange-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-orange-500">
-                  <p className="text-orange-600 font-bold text-[10px]">DETALLE DEL PRODUCTO</p>
-                </div>
-                <div className="border border-[#023047] rounded-b-md overflow-hidden mt-0">
-                  <table className="w-full text-[9px]">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-[#023047] to-[#034E71] text-white">
-                        <th className="px-1.5 py-1 text-left font-medium">SKU</th>
-                        <th className="px-1.5 py-1 text-right font-medium">PRECIO BASE</th>
-                        <th className="px-1.5 py-1 text-right font-medium">PANEL</th>
-                        <th className="px-1.5 py-1 text-right font-medium">GAR. A.I</th>
-                        <th className="px-1.5 py-1 text-right font-medium">GAR. TOTAL</th>
-                        <th className="px-1.5 py-1 text-right font-medium">TOTAL</th>
+            <div className="mx-3 mt-2">
+              <div className="bg-orange-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-orange-500">
+                <p className="text-orange-600 font-bold text-[10px]">DETALLE DEL PRODUCTO</p>
+              </div>
+              <div className="border border-[#023047] rounded-b-md overflow-hidden mt-0">
+                <table className="w-full text-[9px]">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-[#023047] to-[#034E71] text-white">
+                      <th className="px-1.5 py-1 text-left font-medium">SKU</th>
+                      <th className="px-1.5 py-1 text-right font-medium">PRECIO BASE</th>
+                      <th className="px-1.5 py-1 text-right font-medium">PANEL</th>
+                      <th className="px-1.5 py-1 text-right font-medium">GAR. A.I</th>
+                      <th className="px-1.5 py-1 text-right font-medium">GAR. TOTAL</th>
+                      <th className="px-1.5 py-1 text-right font-medium">TOTAL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pedido.productos.map((prod, i) => (
+                      <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-1.5 py-1 font-mono text-[#023047] font-bold">{prod.sku}</td>
+                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.base)}</td>
+                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.panel)}</td>
+                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaAI)}</td>
+                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaTotal)}</td>
+                        <td className="px-1.5 py-1 text-right font-medium text-slate-800">{formatCurrency(prod.totalVenta)}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {pedido.productos.map((prod, i) => (
-                        <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-1.5 py-1 font-mono text-[#023047] font-bold">{prod.sku}</td>
-                          <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.base)}</td>
-                          <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.panel)}</td>
-                          <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaAI)}</td>
-                          <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaTotal)}</td>
-                          <td className="px-1.5 py-1 text-right font-medium text-slate-800">{formatCurrency(prod.totalVenta)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="flex justify-end mt-1">
-                  <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 py-1 rounded-md">
-                    <span className="text-[9px] font-bold">TOTAL VENTA </span>
-                    <span className="text-xs font-bold">{formatCurrency(pedido.totalVenta)}</span>
-                  </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex justify-end mt-1">
+                <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 py-1 rounded-md">
+                  <span className="text-[9px] font-bold">TOTAL VENTA </span>
+                  <span className="text-xs font-bold">{formatCurrency(pedido.totalVenta)}</span>
                 </div>
               </div>
-              {qrImage && (
-                <div className="flex-shrink-0">
-                  <div className="bg-white border-2 border-[#023047] rounded-md p-1">
-                    <img src={qrImage} alt="QR" className="w-16 h-16" />
-                    <p className="text-[#023047] text-[7px] font-bold text-center">Pedido #{pedido.pedido}</p>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Detalles del pedido */}
@@ -254,7 +251,15 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 <div className="bg-white border border-purple-300 rounded-md p-1.5 border-t-2 border-t-purple-600 flex gap-4">
                   <div>
                     <p className="text-purple-700 font-bold text-[9px]">OUTLET</p>
-                    <div className="w-3.5 h-3.5 border-2 border-gray-300 rounded mt-0.5"></div>
+                    <div className={`w-3.5 h-3.5 border-2 rounded mt-0.5 flex items-center justify-center ${
+                      pedido.outlet ? 'border-[#023047] bg-[#023047]' : 'border-gray-300'
+                    }`}>
+                      {pedido.outlet && (
+                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className="text-purple-700 font-bold text-[9px]">COMBO</p>

@@ -157,8 +157,25 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.text('Ecommerce / Marketplace', margin + 52, 18.5);
 
-  // Número de pedido destacado
+  // Número de pedido destacado con QR a la izquierda
   const pedidoBoxX = PAGE_WIDTH - margin - 40;
+  
+  // QR al lado izquierdo del número de pedido
+  const qrSize = 16;
+  const qrX = pedidoBoxX - qrSize - 3;
+  const qrY = 3;
+  
+  try {
+    const qrDataUrl = await generarQR(pedido.id);
+    pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+  } catch (e) {
+    // Si falla el QR, dibujar placeholder
+    pdf.setDrawColor(255, 255, 255);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(qrX, qrY, qrSize, qrSize, 1, 1, 'S');
+  }
+  
+  // Caja del número de pedido
   pdf.setFillColor(255, 255, 255);
   setOpacity(pdf, 0.15);
   pdf.roundedRect(pedidoBoxX - 2, 2, 42, 18, 2, 2, 'F');
@@ -387,38 +404,15 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setLineWidth(0.4);
   pdf.roundedRect(checkboxX + 2, leftY + 7, 3, 3, 0.5, 0.5, 'S');
   pdf.roundedRect(checkboxX + detailWidth / 2, leftY + 7, 3, 3, 0.5, 0.5, 'S');
+  
+  // Marcar casilla OUTLET si el pedido es outlet
+  if (pedido.outlet) {
+    pdf.setFillColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+    pdf.roundedRect(checkboxX + 2.5, leftY + 7.5, 2, 2, 0.3, 0.3, 'F');
+  }
 
   // ============ COLUMNA DERECHA ============
   let rightY = currentY;
-
-  // QR CODE
-  const qrSize = 28;
-  const qrX = rightX;
-  const qrY = rightY;
-  
-  pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(qrX - 1.5, qrY - 1.5, qrSize + 3, qrSize + 10, 1.5, 1.5, 'F');
-  pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-  pdf.setLineWidth(0.4);
-  pdf.roundedRect(qrX - 1.5, qrY - 1.5, qrSize + 3, qrSize + 10, 1.5, 1.5, 'S');
-  
-  try {
-    const qrDataUrl = await generarQR(pedido.id);
-    pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-  } catch (e) {
-    pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-    pdf.setLineWidth(0.4);
-    pdf.roundedRect(qrX, qrY, qrSize, qrSize, 1, 1, 'S');
-  }
-  
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(4.5);
-  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-  const qrLabel = `Pedido #${pedido.pedido}`;
-  const qrLabelW = pdf.getStringUnitWidth(qrLabel) * 4.5 / pdf.internal.scaleFactor;
-  pdf.text(qrLabel, qrX + (qrSize - qrLabelW) / 2, qrY + qrSize + 5);
-
-  rightY += qrSize + 12;
 
   // DILIGENCIAMIENTO OPERATIVO
   drawSectionTitle(pdf, rightX, rightY, 'DILIGENCIAMIENTO OPERATIVO', COLORS.green, COLORS.greenBg, rightColumnWidth);

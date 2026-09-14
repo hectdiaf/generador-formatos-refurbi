@@ -87,6 +87,7 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
   
   const errores: ValidacionError[] = [];
   const pedidosMap = new Map<string, Pedido>();
+  const cedulasMap = new Map<string, string>(); // cedula -> nombre (para detectar duplicados)
   
   rawData.forEach((row, index) => {
     const fila = index + 2; // +2 porque la fila 1 es el encabezado
@@ -98,8 +99,9 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
     const sku = limpiarValor(raw.SKU);
     const fecha = formatearFecha(raw.FECHA);
     const totalVenta = limpiarValor(raw['TOTAL VENTA']);
+    const descripcion = limpiarValor(raw.DESCRIPCION);
     
-    // Validaciones
+    // Validaciones de campos obligatorios
     const erroresFila: string[] = [];
     
     if (!pedidoNum) erroresFila.push('Falta número de pedido');
@@ -108,6 +110,14 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
     if (!sku) erroresFila.push('Falta SKU');
     if (!fecha) erroresFila.push('Falta fecha');
     if (!totalVenta) erroresFila.push('Falta total de venta');
+    
+    // Validar cédula duplicada
+    if (cedula && cedulasMap.has(cedula)) {
+      const nombreExistente = cedulasMap.get(cedula);
+      if (nombreExistente !== nombre) {
+        erroresFila.push(`Cédula ${cedula} ya registrada con otro nombre (${nombreExistente})`);
+      }
+    }
     
     if (erroresFila.length > 0) {
       errores.push({
@@ -118,10 +128,18 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
       return; // Saltar esta fila
     }
     
+    // Registrar cédula si es nueva
+    if (!cedulasMap.has(cedula)) {
+      cedulasMap.set(cedula, nombre);
+    }
+    
+    // Detectar si es OUTLET desde la descripción
+    const esOutlet = descripcion.toLowerCase().includes('outlet');
+    
     // Crear producto
     const producto: Producto = {
       sku,
-      descripcion: limpiarValor(raw.DESCRIPCION),
+      descripcion,
       venta: raw.VENTA ?? '',
       base: raw.BASE ?? '',
       panel: raw.Panel ?? '',
@@ -135,6 +153,11 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
       // Agregar producto al pedido existente
       const pedidoExistente = pedidosMap.get(pedidoNum)!;
       pedidoExistente.productos.push(producto);
+      
+      // Si algún producto es outlet, marcar el pedido como outlet
+      if (esOutlet) {
+        pedidoExistente.outlet = true;
+      }
       
       // Recalcular el total sumando todos los productos
       let totalSumado = 0;
@@ -155,7 +178,8 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
         celular: limpiarValor(raw.Celular),
         pasarela: limpiarValor(raw.Pasarela),
         totalVenta: parseNumber(totalVenta),
-        fechaGeneracion: new Date().toISOString()
+        fechaGeneracion: new Date().toISOString(),
+        outlet: esOutlet
       };
       pedidosMap.set(pedidoNum, pedido);
     }

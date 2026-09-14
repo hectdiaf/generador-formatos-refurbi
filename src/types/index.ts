@@ -43,6 +43,7 @@ export interface Pedido {
   pasarela: string;
   totalVenta: string | number;
   fechaGeneracion: string;
+  outlet: boolean; // Detectado desde la descripción
 }
 
 export interface ValidacionError {
