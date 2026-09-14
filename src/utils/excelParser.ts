@@ -136,9 +136,12 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
       const pedidoExistente = pedidosMap.get(pedidoNum)!;
       pedidoExistente.productos.push(producto);
       
-      // Sumar el total de venta del nuevo producto
-      const nuevoTotal = parseNumber(pedidoExistente.totalVenta) + parseNumber(producto.totalVenta);
-      pedidoExistente.totalVenta = nuevoTotal;
+      // Recalcular el total sumando todos los productos
+      let totalSumado = 0;
+      for (const prod of pedidoExistente.productos) {
+        totalSumado += parseNumber(prod.totalVenta);
+      }
+      pedidoExistente.totalVenta = totalSumado;
     } else {
       // Crear nuevo pedido
       const pedido: Pedido = {
@@ -151,7 +154,7 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
         nombre,
         celular: limpiarValor(raw.Celular),
         pasarela: limpiarValor(raw.Pasarela),
-        totalVenta,
+        totalVenta: parseNumber(totalVenta),
         fechaGeneracion: new Date().toISOString()
       };
       pedidosMap.set(pedidoNum, pedido);
