@@ -158,7 +158,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
               
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  {/* Logo + Título separados por slash */}
+                  {/* Logo de Refurbi */}
                   <div className="flex items-center gap-2 mb-1">
                     {/* Logo 3 círculos */}
                     <div className="flex -space-x-0.5">
@@ -167,24 +167,22 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                       <div className="w-2 h-2 bg-white/80 rounded-full"></div>
                     </div>
                     <p className="text-white font-bold text-[10px] tracking-wide">REFURBI</p>
-                    <p className="text-white font-bold text-[10px]">/</p>
-                    <p className="text-white font-bold text-[10px] tracking-wide">FORMATO DE REMISIÓN DE PEDIDOS</p>
                   </div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <div className="flex items-center gap-1">
-                      {/* Icono carrito */}
-                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      <p className="text-white font-bold text-[8px]">{pedido.mkp}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {/* Icono calendario */}
-                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-white font-bold text-[8px]">{pedido.fecha}</p>
-                    </div>
+                  {/* Título debajo del logo */}
+                  <p className="text-white font-bold text-[9px] tracking-wide mb-1">FORMATO DE REMISIÓN DE PEDIDOS</p>
+                  {/* MKP con icono de carrito */}
+                  <div className="flex items-center gap-1 mb-1">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <p className="text-white font-bold text-[10px]">{pedido.mkp}</p>
+                  </div>
+                  {/* Fecha con icono de calendario */}
+                  <div className="flex items-center gap-1">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-white font-bold text-[8px]">{pedido.fecha}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
@@ -226,6 +224,14 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     <div className="bg-white border border-blue-700 rounded-md p-1.5">
                       <p className="text-black text-[7px] font-medium">CELULAR</p>
                       <p className="text-black font-bold text-[9px]">{pedido.celular}</p>
+                    </div>
+                  </div>
+                  {/* Código de barras de la cédula */}
+                  <div className="bg-white border border-blue-700 rounded-md p-1">
+                    <div className="flex gap-px">
+                      {Array.from({ length: 30 }).map((_, i) => (
+                        <div key={i} className="bg-[#023047]" style={{ width: '1px', height: '6px' }}></div>
+                      ))}
                     </div>
                   </div>
                 </div>
