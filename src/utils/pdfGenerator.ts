@@ -13,7 +13,7 @@ import { generarCodigoBarras } from './barcodeGenerator';
 const PAGE_WIDTH = 215.9;  // 8.5 inches
 const PAGE_HEIGHT = 139.7; // 5.5 inches
 
-// Paleta de colores Refurbi - Tonos azules unificados (sin grises para impresión)
+// Paleta de colores Refurbi - Tonos azules y negros (optimizado para impresión)
 const COLORS = {
   brand: [2, 48, 71] as const,
   brandLight: [3, 78, 113] as const,
@@ -25,7 +25,7 @@ const COLORS = {
   accentBg: [224, 242, 254] as const,
   navy: [15, 23, 42] as const,
   slate: [51, 65, 85] as const,
-  slateLight: [71, 85, 105] as const, // Más oscuro para impresión
+  slateLight: [0, 0, 0] as const, // Negro puro para impresión
   white: [255, 255, 255] as const,
   border: [30, 64, 175] as const, // Borde azul en lugar de gris
 };
@@ -109,34 +109,19 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F');
 
   // ============ ENCABEZADO ============
-  const headerHeight = 24;
+  const headerHeight = 28;
   drawGradientRect(pdf, 0, 0, PAGE_WIDTH, headerHeight, COLORS.brand, COLORS.brandLight, 8);
   
   // Elementos decorativos
   pdf.setFillColor(255, 255, 255);
   setOpacity(pdf, 0.08);
-  pdf.circle(PAGE_WIDTH - 15, 11, 20, 'F');
+  pdf.circle(PAGE_WIDTH - 15, 14, 20, 'F');
   setOpacity(pdf, 1);
 
-  // Logo de Refurbi
-  drawRefurbiLogo(pdf, margin + 2, 3, 9);
-  
-  // Texto REFURBI
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(12);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('REFURBI', margin + 15, 8);
-
-  // Propósito
-  pdf.setFont('helvetica', 'italic');
-  pdf.setFontSize(5);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('Estamos convencidos que las segundas oportunidades no son solo para las personas.', margin + 15, 11.5);
-
-  // QR más grande y centrado a la izquierda
-  const qrSize = 16;
-  const qrX = margin + 2;
-  const qrY = 13;
+  // QR centrado en la parte superior
+  const qrSize = 18;
+  const qrX = (PAGE_WIDTH - qrSize) / 2;
+  const qrY = 2;
   
   try {
     const qrDataUrl = await generarQR(pedido.id);
@@ -145,32 +130,46 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     // Placeholder
   }
 
-  // Título más grande al lado derecho de la fecha
-  const titleX = qrX + qrSize + 3;
+  // Logo de Refurbi + Título separados por slash (debajo del QR)
+  const logoY = 22;
+  drawRefurbiLogo(pdf, margin + 2, logoY - 1, 7);
+  
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(11);
+  pdf.setFontSize(10);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('Formato de remisión de pedidos', titleX, 18);
+  pdf.text('REFURBI', margin + 12, logoY + 4);
+  
+  // Slash separador
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(10);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text('/', margin + 35, logoY + 4);
+  
+  // Título en mayúscula
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(10);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 40, logoY + 4);
 
-  // Canal/MKP con icono de carrito
-  const iconY = 22;
+  // Canal/MKP con icono de carrito (debajo del título)
+  const iconY = logoY + 7;
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   // Icono carrito (simplificado)
   pdf.setLineWidth(0.5);
   pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.line(titleX, iconY - 1, titleX + 2, iconY - 1);
-  pdf.line(titleX + 0.5, iconY - 1, titleX + 1, iconY + 1);
-  pdf.line(titleX + 1.5, iconY - 1, titleX + 2, iconY + 1);
-  pdf.circle(titleX + 0.8, iconY + 1.5, 0.3, 'F');
-  pdf.circle(titleX + 1.7, iconY + 1.5, 0.3, 'F');
+  pdf.line(margin + 2, iconY - 1, margin + 4, iconY - 1);
+  pdf.line(margin + 2.5, iconY - 1, margin + 3, iconY + 1);
+  pdf.line(margin + 3.5, iconY - 1, margin + 4, iconY + 1);
+  pdf.circle(margin + 2.8, iconY + 1.5, 0.3, 'F');
+  pdf.circle(margin + 3.7, iconY + 1.5, 0.3, 'F');
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text(pedido.mkp, titleX + 4, iconY);
+  pdf.text(pedido.mkp, margin + 6, iconY);
 
   // Fecha con icono de calendario
-  const fechaX = titleX + 4 + pdf.getStringUnitWidth(pedido.mkp) * 8 / pdf.internal.scaleFactor + 3;
+  const fechaX = margin + 6 + pdf.getStringUnitWidth(pedido.mkp) * 8 / pdf.internal.scaleFactor + 3;
   // Icono calendario (simplificado)
   pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.setLineWidth(0.4);
@@ -184,12 +183,12 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.text(pedido.fecha, fechaX + 4, iconY);
 
-  // Número de pedido destacado (lado derecho)
-  const pedidoBoxX = PAGE_WIDTH - margin - 40;
+  // Número de pedido destacado (lado derecho, parte superior)
+  const pedidoBoxX = PAGE_WIDTH - margin - 45;
   
   pdf.setFillColor(255, 255, 255);
   setOpacity(pdf, 0.15);
-  pdf.roundedRect(pedidoBoxX - 2, 2, 42, 14, 2, 2, 'F');
+  pdf.roundedRect(pedidoBoxX - 2, 2, 47, 12, 2, 2, 'F');
   setOpacity(pdf, 1);
   
   pdf.setFont('helvetica', 'normal');
@@ -202,10 +201,10 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.text(String(pedido.pedido), pedidoBoxX, 13);
 
-  // Código de barras Code 128 con recuadro blanco
-  const barcodeY = 17;
-  const barcodeHeight = 8;
-  const barcodeWidth = 40;
+  // Código de barras Code 128 justo debajo del número de pedido
+  const barcodeY = 15;
+  const barcodeHeight = 10;
+  const barcodeWidth = 45;
   
   // Recuadro blanco alrededor del código de barras
   pdf.setFillColor(255, 255, 255);

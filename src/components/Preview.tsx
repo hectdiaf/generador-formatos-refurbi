@@ -146,34 +146,57 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
             {/* Encabezado */}
             <div className="bg-gradient-to-r from-[#023047] to-[#034E71] px-3 py-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              
+              {/* QR centrado en la parte superior */}
+              <div className="flex justify-center mb-2">
+                {qrImage && (
+                  <div className="bg-white rounded p-0.5">
+                    <img src={qrImage} alt="QR" className="w-12 h-12" />
+                  </div>
+                )}
+              </div>
+              
               <div className="flex justify-between items-start">
                 <div className="flex-1">
+                  {/* Logo + Título separados por slash */}
                   <div className="flex items-center gap-2 mb-1">
                     {/* Logo 3 círculos */}
-                    <div className="flex -space-x-1">
-                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
-                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
-                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
+                    <div className="flex -space-x-0.5">
+                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
                     </div>
-                    <p className="text-white font-bold text-xs tracking-wide">REFURBI</p>
+                    <p className="text-white font-bold text-[10px] tracking-wide">REFURBI</p>
+                    <p className="text-white font-bold text-[10px]">/</p>
+                    <p className="text-white font-bold text-[10px] tracking-wide">FORMATO DE REMISIÓN DE PEDIDOS</p>
                   </div>
-                  <p className="text-blue-200 text-[7px] italic leading-tight mb-1">Las segundas oportunidades no son solo para las personas.</p>
-                  <p className="text-white font-bold text-[9px]">Formato de remisión de pedidos</p>
-                  <p className="text-blue-100 font-bold text-[8px] mt-0.5">{pedido.mkp}  |  {pedido.fecha}</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  {qrImage && (
-                    <div className="bg-white rounded p-0.5">
-                      <img src={qrImage} alt="QR" className="w-8 h-8" />
+                  <div className="flex items-center gap-3 mt-1">
+                    <div className="flex items-center gap-1">
+                      {/* Icono carrito */}
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <p className="text-white font-bold text-[8px]">{pedido.mkp}</p>
                     </div>
-                  )}
+                    <div className="flex items-center gap-1">
+                      {/* Icono calendario */}
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-white font-bold text-[8px]">{pedido.fecha}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
                   <div className="bg-white/15 rounded-lg px-2 py-1 text-right">
                     <p className="text-blue-200 text-[7px]">PEDIDO</p>
                     <p className="text-white font-bold text-lg leading-tight">{pedido.pedido}</p>
-                    {/* Código de barras simulado */}
-                    <div className="mt-1 flex gap-px">
-                      {Array.from({ length: 20 }).map((_, i) => (
-                        <div key={i} className="bg-white" style={{ width: '1px', height: '6px' }}></div>
+                  </div>
+                  {/* Código de barras debajo del número de pedido */}
+                  <div className="bg-white rounded px-1 py-0.5">
+                    <div className="flex gap-px">
+                      {Array.from({ length: 25 }).map((_, i) => (
+                        <div key={i} className="bg-[#023047]" style={{ width: '1px', height: '8px' }}></div>
                       ))}
                     </div>
                   </div>
@@ -191,18 +214,18 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                   <p className="text-blue-700 font-bold text-[9px]">DATOS DEL CLIENTE</p>
                 </div>
                 <div className="space-y-1 mt-1">
-                  <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                    <p className="text-gray-400 text-[7px]">NOMBRE</p>
-                    <p className="text-slate-800 font-bold text-[9px]">{pedido.nombre.toUpperCase()}</p>
+                  <div className="bg-white border border-blue-700 rounded-md p-1.5">
+                    <p className="text-black text-[7px] font-medium">NOMBRE</p>
+                    <p className="text-black font-bold text-[9px]">{pedido.nombre.toUpperCase()}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-1">
-                    <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                      <p className="text-gray-400 text-[7px]">C.C.</p>
-                      <p className="text-slate-800 font-bold text-[9px]">{pedido.cedula}</p>
+                    <div className="bg-white border border-blue-700 rounded-md p-1.5">
+                      <p className="text-black text-[7px] font-medium">C.C.</p>
+                      <p className="text-black font-bold text-[9px]">{pedido.cedula}</p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                      <p className="text-gray-400 text-[7px]">CELULAR</p>
-                      <p className="text-slate-800 font-bold text-[9px]">{pedido.celular}</p>
+                    <div className="bg-white border border-blue-700 rounded-md p-1.5">
+                      <p className="text-black text-[7px] font-medium">CELULAR</p>
+                      <p className="text-black font-bold text-[9px]">{pedido.celular}</p>
                     </div>
                   </div>
                 </div>
@@ -226,12 +249,12 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                     </thead>
                     <tbody>
                       {pedido.productos.map((prod, i) => (
-                        <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-blue-50'}>
                           <td className="px-1 py-0.5 font-mono text-[#023047] font-bold text-[7px]">{prod.sku}</td>
-                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.base)}</td>
-                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.panel)}</td>
-                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.garantiaAI)}</td>
-                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.garantiaTotal)}</td>
+                          <td className="px-1 py-0.5 text-right text-black text-[7px]">{formatCurrency(prod.base)}</td>
+                          <td className="px-1 py-0.5 text-right text-black text-[7px]">{formatCurrency(prod.panel)}</td>
+                          <td className="px-1 py-0.5 text-right text-black text-[7px]">{formatCurrency(prod.garantiaAI)}</td>
+                          <td className="px-1 py-0.5 text-right text-black text-[7px]">{formatCurrency(prod.garantiaTotal)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -255,11 +278,11 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                   <p className="text-blue-800 font-bold text-[9px]">DETALLES DEL PEDIDO</p>
                 </div>
                 <div className="grid grid-cols-2 gap-1 mt-1">
-                  <div className="bg-white border border-blue-300 rounded-md p-1.5 border-t-2 border-t-blue-700">
+                  <div className="bg-white border border-blue-700 rounded-md p-1.5 border-t-2 border-t-blue-700">
                     <p className="text-blue-800 font-bold text-[8px]">PASARELA</p>
-                    <p className="text-slate-700 text-[8px] mt-0.5">{pedido.pasarela || '-'}</p>
+                    <p className="text-black text-[8px] mt-0.5">{pedido.pasarela || '-'}</p>
                   </div>
-                  <div className="bg-white border border-blue-300 rounded-md p-1.5 border-t-2 border-t-blue-700 flex gap-2">
+                  <div className="bg-white border border-blue-700 rounded-md p-1.5 border-t-2 border-t-blue-700 flex gap-2">
                     <div>
                       <p className="text-blue-800 font-bold text-[8px]">OUTLET</p>
                       <div className={`w-3 h-3 border-2 rounded mt-0.5 flex items-center justify-center ${
@@ -282,19 +305,19 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
 
               {/* Abajo Derecha: Diligenciamiento Operativo (60%) */}
               <div>
-                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-500">
-                  <p className="text-blue-600 font-bold text-[9px]">DILIGENCIAMIENTO OPERATIVO</p>
+                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-700">
+                  <p className="text-blue-800 font-bold text-[9px]">DILIGENCIAMIENTO OPERATIVO</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1 mt-1">
-                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
-                    <p className="text-blue-600 font-bold text-[8px]">FACTURA</p>
-                    <p className="text-[7px] text-blue-700 mt-0.5">N.____________</p>
+                  <div className="bg-white border border-blue-700 rounded-md p-1 border-t-2 border-t-blue-700 h-12">
+                    <p className="text-blue-800 font-bold text-[8px]">FACTURA</p>
+                    <p className="text-[7px] text-black mt-0.5">N.____________</p>
                   </div>
-                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
-                    <p className="text-blue-600 font-bold text-[8px]">OBSERVACIONES</p>
+                  <div className="bg-white border border-blue-700 rounded-md p-1 border-t-2 border-t-blue-700 h-12">
+                    <p className="text-blue-800 font-bold text-[8px]">OBSERVACIONES</p>
                   </div>
-                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
-                    <p className="text-blue-600 font-bold text-[8px]">PROCESO</p>
+                  <div className="bg-white border border-blue-700 rounded-md p-1 border-t-2 border-t-blue-700 h-12">
+                    <p className="text-blue-800 font-bold text-[8px]">PROCESO</p>
                   </div>
                 </div>
               </div>
