@@ -148,18 +148,10 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
               <div className="flex justify-between items-start">
-                {/* Lado izquierdo: Logo + Título */}
+                {/* Lado izquierdo: Título */}
                 <div className="flex items-start gap-2">
-                  {/* Logo de Refurbi */}
                   <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-1 mb-0.5">
-                      <div className="flex -space-x-0.5">
-                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
-                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
-                        <div className="w-3 h-3 bg-white/80 rounded-full border border-white/40"></div>
-                      </div>
-                      <p className="text-white font-bold text-[14px] tracking-wide">REFURBI</p>
-                    </div>
+                    <p className="text-white font-bold text-[16px] tracking-wide mb-0.5">REFURBI</p>
                     <p className="text-white font-bold text-[10px] tracking-wide mb-2">FORMATO DE REMISIÓN DE PEDIDOS</p>
                   </div>
                 </div>

@@ -126,14 +126,13 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.circle(PAGE_WIDTH - 15, 16, 20, 'F');
   setOpacity(pdf, 1);
 
-  // Logo de Refurbi + Título al mismo nivel del QR (izquierda)
+  // Título al mismo nivel del QR (izquierda)
   const titleY = 8; // Mismo nivel vertical que el QR
-  drawRefurbiLogo(pdf, margin + 2, titleY - 1, 12); // Reducido de 15 a 12
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(12);
+  pdf.setFontSize(14);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('REFURBI', margin + 15, titleY + 4);
+  pdf.text('REFURBI', margin + 2, titleY + 5);
   
   // Título al mismo nivel del QR
   pdf.setFont('helvetica', 'bold');
