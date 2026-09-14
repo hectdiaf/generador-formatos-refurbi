@@ -147,44 +147,33 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
             <div className="bg-gradient-to-r from-[#023047] to-[#034E71] px-3 py-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
-              {/* QR centrado en la parte superior */}
-              <div className="flex justify-center mb-2">
-                {qrImage && (
-                  <div className="bg-white rounded p-0.5">
-                    <img src={qrImage} alt="QR" className="w-12 h-12" />
-                  </div>
-                )}
-              </div>
-              
               <div className="flex justify-between items-start">
-                <div className="flex-1">
+                {/* Lado izquierdo: Logo + Título al mismo nivel del QR */}
+                <div className="flex items-start gap-2">
                   {/* Logo de Refurbi */}
-                  <div className="flex items-center gap-2 mb-1">
-                    {/* Logo 3 círculos */}
-                    <div className="flex -space-x-0.5">
-                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                  <div className="flex flex-col items-start">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className="flex -space-x-0.5">
+                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                        <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                      </div>
+                      <p className="text-white font-bold text-[10px] tracking-wide">REFURBI</p>
                     </div>
-                    <p className="text-white font-bold text-[10px] tracking-wide">REFURBI</p>
-                  </div>
-                  {/* Título debajo del logo */}
-                  <p className="text-white font-bold text-[9px] tracking-wide mb-1">FORMATO DE REMISIÓN DE PEDIDOS</p>
-                  {/* MKP con icono de carrito */}
-                  <div className="flex items-center gap-1 mb-1">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <p className="text-white font-bold text-[10px]">{pedido.mkp}</p>
-                  </div>
-                  {/* Fecha con icono de calendario */}
-                  <div className="flex items-center gap-1">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-white font-bold text-[8px]">{pedido.fecha}</p>
+                    <p className="text-white font-bold text-[9px] tracking-wide">FORMATO DE REMISIÓN DE PEDIDOS</p>
                   </div>
                 </div>
+                
+                {/* Centro: QR */}
+                <div className="flex-shrink-0">
+                  {qrImage && (
+                    <div className="bg-white rounded p-0.5">
+                      <img src={qrImage} alt="QR" className="w-12 h-12" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Lado derecho: Número de pedido */}
                 <div className="flex flex-col items-end gap-1">
                   <div className="bg-white/15 rounded-lg px-2 py-1 text-right">
                     <p className="text-blue-200 text-[7px]">PEDIDO</p>
@@ -198,6 +187,22 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+              
+              {/* MKP y Fecha debajo */}
+              <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <p className="text-white font-bold text-[10px]">{pedido.mkp}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-white font-bold text-[8px]">{pedido.fecha}</p>
                 </div>
               </div>
             </div>

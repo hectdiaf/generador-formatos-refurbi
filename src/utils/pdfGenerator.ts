@@ -130,24 +130,23 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     // Placeholder
   }
 
-  // Logo de Refurbi (arriba a la izquierda, debajo del QR)
-  const logoY = 22;
-  drawRefurbiLogo(pdf, margin + 2, logoY - 1, 7);
+  // Logo de Refurbi + Título al mismo nivel del QR (izquierda)
+  const titleY = 8; // Mismo nivel vertical que el QR
+  drawRefurbiLogo(pdf, margin + 2, titleY - 1, 7);
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('REFURBI', margin + 12, logoY + 4);
+  pdf.text('REFURBI', margin + 12, titleY + 4);
   
-  // Título debajo del logo
-  const titleY = logoY + 7;
+  // Título al mismo nivel del QR
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY);
+  pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 10);
 
   // Canal/MKP con icono de carrito (debajo del título, letra más grande)
-  const mkpY = titleY + 5;
+  const mkpY = titleY + 15;
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   // Icono carrito (simplificado)
   pdf.setLineWidth(0.5);
