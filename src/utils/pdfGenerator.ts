@@ -118,18 +118,6 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.circle(PAGE_WIDTH - 15, 16, 20, 'F');
   setOpacity(pdf, 1);
 
-  // QR centrado en la parte superior
-  const qrSize = 18;
-  const qrX = (PAGE_WIDTH - qrSize) / 2;
-  const qrY = 2;
-  
-  try {
-    const qrDataUrl = await generarQR(pedido.id);
-    pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-  } catch (e) {
-    // Placeholder
-  }
-
   // Logo de Refurbi + Título al mismo nivel del QR (izquierda)
   const titleY = 8; // Mismo nivel vertical que el QR
   drawRefurbiLogo(pdf, margin + 2, titleY - 1, 7);
@@ -145,10 +133,11 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.text('FORMATO DE REMISIÓN DE PEDIDOS', margin + 2, titleY + 10);
 
-  // Canal/MKP con icono de carrito (debajo del título, letra más grande)
+  // Canal/MKP y Fecha en la misma línea
   const mkpY = titleY + 15;
-  pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  
   // Icono carrito (simplificado)
+  pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.setLineWidth(0.5);
   pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.line(margin + 2, mkpY - 1, margin + 4, mkpY - 1);
@@ -162,20 +151,33 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.text(pedido.mkp, margin + 6, mkpY);
 
-  // Fecha con icono de calendario (debajo del MKP)
-  const fechaY = mkpY + 5;
+  // Fecha en la misma línea que MKP
+  const fechaX = margin + 6 + pdf.getStringUnitWidth(pedido.mkp) * 10 / pdf.internal.scaleFactor + 5;
+  
   // Icono calendario (simplificado)
   pdf.setDrawColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.setLineWidth(0.4);
-  pdf.rect(margin + 2, fechaY - 1.5, 3, 3);
-  pdf.line(margin + 2, fechaY - 0.5, margin + 5, fechaY - 0.5);
-  pdf.line(margin + 2.8, fechaY - 2, margin + 2.8, fechaY - 1.2);
-  pdf.line(margin + 4.2, fechaY - 2, margin + 4.2, fechaY - 1.2);
+  pdf.rect(fechaX, mkpY - 1.5, 3, 3);
+  pdf.line(fechaX, mkpY - 0.5, fechaX + 3, mkpY - 0.5);
+  pdf.line(fechaX + 0.8, mkpY - 2, fechaX + 0.8, mkpY - 1.2);
+  pdf.line(fechaX + 2.2, mkpY - 2, fechaX + 2.2, mkpY - 1.2);
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text(pedido.fecha, margin + 7, fechaY);
+  pdf.text(pedido.fecha, fechaX + 4, mkpY);
+
+  // QR centrado, bajado para que su parte inferior se alinee con la línea de MKP/fecha
+  const qrSize = 18;
+  const qrX = (PAGE_WIDTH - qrSize) / 2;
+  const qrY = mkpY - qrSize; // Parte inferior del QR alineada con mkpY
+  
+  try {
+    const qrDataUrl = await generarQR(pedido.id);
+    pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+  } catch (e) {
+    // Placeholder
+  }
 
   // Número de pedido destacado (lado derecho, parte superior)
   const pedidoBoxX = PAGE_WIDTH - margin - 45;

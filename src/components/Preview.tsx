@@ -148,7 +148,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
               <div className="flex justify-between items-start">
-                {/* Lado izquierdo: Logo + Título al mismo nivel del QR */}
+                {/* Lado izquierdo: Logo + Título */}
                 <div className="flex items-start gap-2">
                   {/* Logo de Refurbi */}
                   <div className="flex flex-col items-start">
@@ -164,8 +164,8 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                   </div>
                 </div>
                 
-                {/* Centro: QR */}
-                <div className="flex-shrink-0">
+                {/* Centro: QR (bajado para alinear parte inferior con MKP/fecha) */}
+                <div className="flex-shrink-0 mt-4">
                   {qrImage && (
                     <div className="bg-white rounded p-0.5">
                       <img src={qrImage} alt="QR" className="w-12 h-12" />
@@ -190,8 +190,8 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 </div>
               </div>
               
-              {/* MKP y Fecha debajo */}
-              <div className="flex items-center gap-3 mt-2">
+              {/* MKP y Fecha en la misma línea */}
+              <div className="flex items-center gap-4 mt-1">
                 <div className="flex items-center gap-1">
                   <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
