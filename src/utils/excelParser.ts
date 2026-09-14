@@ -92,6 +92,7 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
   rawData.forEach((row, index) => {
     const fila = index + 2; // +2 porque la fila 1 es el encabezado
     const raw = row as unknown as PedidoRaw;
+    const rawAny = row as Record<string, unknown>;
     
     const pedidoNum = limpiarValor(raw.Pedido);
     const nombre = limpiarValor(raw.NOMBRE);
@@ -100,6 +101,12 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
     const fecha = formatearFecha(raw.FECHA);
     const totalVenta = limpiarValor(raw['TOTAL VENTA']);
     const descripcion = limpiarValor(raw.DESCRIPCION);
+    
+    // Buscar la columna Pasarela de forma flexible
+    const pasarelaKey = Object.keys(rawAny).find(key => 
+      key.toLowerCase().replace(/\s+/g, '') === 'pasarela'
+    );
+    const pasarela = pasarelaKey ? limpiarValor(rawAny[pasarelaKey] as string | number) : '';
     
     // Validaciones de campos obligatorios
     const erroresFila: string[] = [];
@@ -176,7 +183,7 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
         fecha,
         nombre,
         celular: limpiarValor(raw.Celular),
-        pasarela: limpiarValor(raw.Pasarela),
+        pasarela: pasarela,
         totalVenta: parseNumber(totalVenta),
         fechaGeneracion: new Date().toISOString(),
         outlet: esOutlet
