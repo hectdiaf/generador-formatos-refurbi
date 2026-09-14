@@ -1,29 +1,28 @@
 // ============================================================
-// Generador de PDF - Formato Refurbi (Diseño Mejorado)
-// Media Carta Horizontal (5.5 x 8.5 pulgadas)
+// Generador de PDF - Formato Refurbi
+// Media Carta VERTICAL (5.5 x 8.5 pulgadas)
 // ============================================================
 
 import jsPDF from 'jspdf';
 import type { Pedido } from '../types';
 import { generarQR } from './qrGenerator';
 
-// Dimensiones Media Carta Horizontal en mm
-const PAGE_WIDTH = 215.9;
-const PAGE_HEIGHT = 139.7;
+// Dimensiones Media Carta VERTICAL en mm
+const PAGE_WIDTH = 139.7;  // 5.5 inches
+const PAGE_HEIGHT = 215.9; // 8.5 inches
 
 // Paleta de colores Refurbi
 const COLORS = {
-  brand: [2, 48, 71] as const,        // #023047 - Color oficial Refurbi
-  brandLight: [3, 78, 113] as const,  // #034E71
-  brandSoft: [232, 243, 248] as const, // Fondo suave
-  blue: [37, 99, 235] as const,       // Azul vibrante
-  blueBg: [239, 246, 255] as const,   // Azul fondo
-  green: [16, 150, 120] as const,     // Verde
-  greenBg: [230, 248, 240] as const,  // Verde fondo
-  purple: [108, 72, 196] as const,    // Púrpura
-  purpleBg: [243, 238, 255] as const, // Púrpura fondo
-  orange: [234, 112, 34] as const,    // Naranja
-  orangeBg: [255, 244, 232] as const, // Naranja fondo
+  brand: [2, 48, 71] as const,
+  brandLight: [3, 78, 113] as const,
+  blue: [37, 99, 235] as const,
+  blueBg: [239, 246, 255] as const,
+  green: [16, 150, 120] as const,
+  greenBg: [230, 248, 240] as const,
+  purple: [108, 72, 196] as const,
+  purpleBg: [243, 238, 255] as const,
+  orange: [234, 112, 34] as const,
+  orangeBg: [255, 244, 232] as const,
   navy: [15, 23, 42] as const,
   slate: [51, 65, 85] as const,
   slateLight: [100, 116, 139] as const,
@@ -40,12 +39,22 @@ function formatCurrency(value: string | number): string {
   return '$' + num.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// Helper para setGState sin errores de TypeScript
+function parseNumber(value: string | number): number {
+  if (typeof value === 'number') return value;
+  const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+  return isNaN(num) ? 0 : num;
+}
+
+// Helper para setGState
 function setOpacity(pdf: jsPDF, opacity: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = pdf as any;
   if (p.GState) {
-    p.setGState(new p.GState({ opacity }));
+    try {
+      p.setGState(new p.GState({ opacity }));
+    } catch (e) {
+      // Ignorar errores de opacidad
+    }
   }
 }
 
@@ -69,17 +78,14 @@ function drawGradientRect(
 
 // Dibujar el logo de Refurbi (3 círculos superpuestos)
 function drawRefurbiLogo(pdf: jsPDF, x: number, y: number, size: number) {
-  const circleSize = size * 0.45;
-  const offset = size * 0.25;
+  const circleSize = size * 0.4;
+  const offset = size * 0.22;
   
   pdf.setFillColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-  setOpacity(pdf, 0.85);
+  setOpacity(pdf, 0.9);
   
-  // Círculo izquierdo
   pdf.circle(x + circleSize, y + size / 2, circleSize, 'F');
-  // Círculo central
   pdf.circle(x + circleSize + offset, y + size / 2, circleSize, 'F');
-  // Círculo derecho
   pdf.circle(x + circleSize + offset * 2, y + size / 2, circleSize, 'F');
   
   setOpacity(pdf, 1);
@@ -94,107 +100,104 @@ function drawSectionTitle(
   bgColor: readonly number[],
   width: number
 ) {
-  // Fondo de la sección
   pdf.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-  pdf.roundedRect(x, y, width, 7, 1.5, 1.5, 'F');
+  pdf.roundedRect(x, y, width, 8, 1.5, 1.5, 'F');
   
-  // Barra lateral de color
   pdf.setFillColor(barColor[0], barColor[1], barColor[2]);
-  pdf.roundedRect(x, y, 3, 7, 1.5, 1.5, 'F');
+  pdf.roundedRect(x, y, 3, 8, 1.5, 1.5, 'F');
   
-  // Texto
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(7.5);
+  pdf.setFontSize(8);
   pdf.setTextColor(barColor[0], barColor[1], barColor[2]);
-  pdf.text(title, x + 5, y + 5);
+  pdf.text(title, x + 6, y + 5.5);
 }
 
 /**
  * Dibuja una página de pedido en el PDF
  */
 async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
-  const margin = 6;
+  const margin = 8;
   const contentWidth = PAGE_WIDTH - margin * 2;
   let currentY = margin;
 
-  // ============ FONDO ============
+  // Fondo blanco
   pdf.setFillColor(255, 255, 255);
   pdf.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F');
 
-  // ============ ENCABEZADO COMPACTO CON GRADIENTE ============
-  const headerHeight = 22;
-  drawGradientRect(pdf, 0, 0, PAGE_WIDTH, headerHeight, COLORS.brand, COLORS.brandLight, 10);
+  // ============ ENCABEZADO ============
+  const headerHeight = 28;
+  drawGradientRect(pdf, 0, 0, PAGE_WIDTH, headerHeight, COLORS.brand, COLORS.brandLight, 12);
   
   // Elementos decorativos
   pdf.setFillColor(255, 255, 255);
-  setOpacity(pdf, 0.06);
-  pdf.circle(PAGE_WIDTH - 10, 11, 20, 'F');
-  pdf.circle(PAGE_WIDTH - 30, 4, 12, 'F');
+  setOpacity(pdf, 0.08);
+  pdf.circle(PAGE_WIDTH - 15, 14, 25, 'F');
   setOpacity(pdf, 1);
 
-  // Logo de Refurbi (3 círculos)
-  drawRefurbiLogo(pdf, margin + 2, 3, 9);
+  // Logo de Refurbi
+  drawRefurbiLogo(pdf, margin + 2, 4, 12);
   
-  // Texto REFURBI al lado del logo
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(11);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('REFURBI', margin + 16, 9);
-
-  // Propósito (compacto)
-  pdf.setFont('helvetica', 'italic');
-  pdf.setFontSize(5.5);
-  pdf.setTextColor(180, 210, 225);
-  pdf.text('Estamos convencidos que las segundas oportunidades no son solo para las personas.', margin + 16, 13.5);
-
-  // Título y subtítulo
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(8);
-  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('Formato de remisión de pedidos', margin + 16, 18);
-
-  // Badge Ecommerce
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(margin + 75, 14.5, 38, 5, 1.5, 1.5, 'F');
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
-  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
-  pdf.text('Ecommerce / Marketplace', margin + 77, 18);
-
-  // Número de pedido (lado derecho) - DESTACADO
-  const pedidoBoxX = PAGE_WIDTH - margin - 48;
-  pdf.setFillColor(255, 255, 255);
-  setOpacity(pdf, 0.15);
-  pdf.roundedRect(pedidoBoxX - 2, 2, 50, 18, 2.5, 2.5, 'F');
-  setOpacity(pdf, 1);
-  
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5.5);
-  pdf.setTextColor(180, 210, 225);
-  pdf.text('PEDIDO', pedidoBoxX, 6.5);
-  
+  // Texto REFURBI
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text(String(pedido.pedido), pedidoBoxX, 14.5);
+  pdf.text('REFURBI', margin + 20, 10);
+
+  // Propósito
+  pdf.setFont('helvetica', 'italic');
+  pdf.setFontSize(6);
+  pdf.setTextColor(180, 210, 225);
+  pdf.text('Estamos convencidos que las segundas oportunidades', margin + 20, 15);
+  pdf.text('no son solo para las personas.', margin + 20, 18);
+
+  // Título
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(9);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text('Formato de remisión de pedidos', margin + 2, 24);
+
+  // Badge Ecommerce
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(margin + 55, 21, 42, 5, 1.5, 1.5, 'F');
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(6);
+  pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
+  pdf.text('Ecommerce / Marketplace', margin + 57, 24.5);
+
+  // Número de pedido destacado
+  const pedidoBoxX = PAGE_WIDTH - margin - 45;
+  pdf.setFillColor(255, 255, 255);
+  setOpacity(pdf, 0.15);
+  pdf.roundedRect(pedidoBoxX - 2, 3, 47, 22, 2.5, 2.5, 'F');
+  setOpacity(pdf, 1);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(6);
+  pdf.setTextColor(180, 210, 225);
+  pdf.text('PEDIDO', pedidoBoxX, 8);
+  
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(16);
+  pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
+  pdf.text(String(pedido.pedido), pedidoBoxX, 17);
 
   // Canal y fecha
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(180, 210, 225);
-  pdf.text(`${pedido.mkp}  |  ${pedido.fecha}`, pedidoBoxX, 19);
+  pdf.text(`Canal: ${pedido.mkp}`, pedidoBoxX, 22);
+  pdf.text(`Fecha: ${pedido.fecha}`, pedidoBoxX + 22, 22);
 
-  currentY = headerHeight + 3;
+  currentY = headerHeight + 5;
 
   // ============ DATOS DEL CLIENTE ============
-  const clientWidth = contentWidth;
-  drawSectionTitle(pdf, margin, currentY, 'DATOS DEL CLIENTE', COLORS.blue, COLORS.blueBg, clientWidth);
-  currentY += 9;
+  drawSectionTitle(pdf, margin, currentY, 'DATOS DEL CLIENTE', COLORS.blue, COLORS.blueBg, contentWidth);
+  currentY += 10;
 
-  // Datos en 3 columnas con fondos diferenciados
-  const colWidth = (clientWidth - 4) / 3;
+  // Datos en 3 columnas
+  const colWidth = (contentWidth - 4) / 3;
   const dataY = currentY;
-  const dataH = 10;
+  const dataH = 14;
 
   // Nombre
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
@@ -204,13 +207,13 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.roundedRect(margin, dataY, colWidth - 1, dataH, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5);
+  pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('NOMBRE', margin + 3, dataY + 3.5);
+  pdf.text('NOMBRE', margin + 3, dataY + 4);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(7);
+  pdf.setFontSize(8);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(pedido.nombre.toUpperCase().substring(0, 28), margin + 3, dataY + 7.5);
+  pdf.text(pedido.nombre.toUpperCase().substring(0, 20), margin + 3, dataY + 9);
 
   // Cédula
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
@@ -219,13 +222,13 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.roundedRect(margin + colWidth, dataY, colWidth - 1, dataH, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5);
+  pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('C.C.', margin + colWidth + 3, dataY + 3.5);
+  pdf.text('C.C.', margin + colWidth + 3, dataY + 4);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(7);
+  pdf.setFontSize(8);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(String(pedido.cedula), margin + colWidth + 3, dataY + 7.5);
+  pdf.text(String(pedido.cedula), margin + colWidth + 3, dataY + 9);
 
   // Celular
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
@@ -234,47 +237,45 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.roundedRect(margin + colWidth * 2, dataY, colWidth - 1, dataH, 1.5, 1.5, 'S');
   
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5);
+  pdf.setFontSize(5.5);
   pdf.setTextColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
-  pdf.text('CELULAR', margin + colWidth * 2 + 3, dataY + 3.5);
+  pdf.text('CELULAR', margin + colWidth * 2 + 3, dataY + 4);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(7);
+  pdf.setFontSize(8);
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
-  pdf.text(String(pedido.celular), margin + colWidth * 2 + 3, dataY + 7.5);
+  pdf.text(String(pedido.celular), margin + colWidth * 2 + 3, dataY + 9);
 
-  currentY += dataH + 4;
+  currentY += dataH + 6;
 
   // ============ DETALLE DEL PRODUCTO ============
-  const tableAreaWidth = contentWidth - 32; // Dejar espacio para QR
-  
-  drawSectionTitle(pdf, margin, currentY, 'DETALLE DEL PRODUCTO', COLORS.orange, COLORS.orangeBg, tableAreaWidth);
-  currentY += 9;
+  drawSectionTitle(pdf, margin, currentY, 'DETALLE DEL PRODUCTO', COLORS.orange, COLORS.orangeBg, contentWidth);
+  currentY += 10;
 
   // Tabla
   const cols = [
-    { label: 'SKU', width: tableAreaWidth * 0.30, align: 'left' as const },
-    { label: 'PRECIO BASE', width: tableAreaWidth * 0.14, align: 'right' as const },
-    { label: 'PANEL', width: tableAreaWidth * 0.12, align: 'right' as const },
-    { label: 'GAR. A.I', width: tableAreaWidth * 0.12, align: 'right' as const },
-    { label: 'GAR. TOTAL', width: tableAreaWidth * 0.14, align: 'right' as const },
-    { label: 'TOTAL', width: tableAreaWidth * 0.18, align: 'right' as const }
+    { label: 'SKU', width: contentWidth * 0.35, align: 'left' as const },
+    { label: 'PRECIO BASE', width: contentWidth * 0.16, align: 'right' as const },
+    { label: 'PANEL', width: contentWidth * 0.13, align: 'right' as const },
+    { label: 'GAR. A.I', width: contentWidth * 0.13, align: 'right' as const },
+    { label: 'GAR. TOTAL', width: contentWidth * 0.13, align: 'right' as const },
+    { label: 'TOTAL', width: contentWidth * 0.10, align: 'right' as const }
   ];
 
-  const rowHeight = 6.5;
+  const rowHeight = 7;
   const tableX = margin;
 
   // Encabezados
-  drawGradientRect(pdf, tableX, currentY, tableAreaWidth, rowHeight, COLORS.brand, COLORS.brandLight, 8);
+  drawGradientRect(pdf, tableX, currentY, contentWidth, rowHeight, COLORS.brand, COLORS.brandLight, 8);
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   
   let colX = tableX;
   cols.forEach(col => {
-    const textW = pdf.getStringUnitWidth(col.label) * 5.5 / pdf.internal.scaleFactor;
+    const textW = pdf.getStringUnitWidth(col.label) * 6 / pdf.internal.scaleFactor;
     const textX = col.align === 'right' ? colX + col.width - textW - 2 : colX + 2;
-    pdf.text(col.label, textX, currentY + 4.5);
+    pdf.text(col.label, textX, currentY + 5);
     colX += col.width;
   });
   
@@ -284,10 +285,10 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pedido.productos.forEach((producto, index) => {
     const bgColor = index % 2 === 0 ? COLORS.white : COLORS.grayLight;
     pdf.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-    pdf.rect(tableX, currentY, tableAreaWidth, rowHeight, 'F');
+    pdf.rect(tableX, currentY, contentWidth, rowHeight, 'F');
     
     pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(5.5);
+    pdf.setFontSize(6);
     pdf.setTextColor(COLORS.slate[0], COLORS.slate[1], COLORS.slate[2]);
     
     colX = tableX;
@@ -310,10 +311,10 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
       }
       
       if (col.align === 'right') {
-        const textW = pdf.getStringUnitWidth(values[i]) * 5.5 / pdf.internal.scaleFactor;
-        pdf.text(values[i], colX + col.width - textW - 2, currentY + 4.5);
+        const textW = pdf.getStringUnitWidth(values[i]) * 6 / pdf.internal.scaleFactor;
+        pdf.text(values[i], colX + col.width - textW - 2, currentY + 5);
       } else {
-        pdf.text(values[i], colX + 2, currentY + 4.5);
+        pdf.text(values[i], colX + 2, currentY + 5);
       }
       colX += col.width;
     });
@@ -325,29 +326,30 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   pdf.setLineWidth(0.5);
   const tableStartY = currentY - (pedido.productos.length * rowHeight) - rowHeight;
-  pdf.roundedRect(tableX, tableStartY, tableAreaWidth, currentY - tableStartY, 1.5, 1.5, 'S');
+  pdf.roundedRect(tableX, tableStartY, contentWidth, currentY - tableStartY, 1.5, 1.5, 'S');
 
   // Total destacado
-  currentY += 2;
-  const totalBoxW = 65;
-  const totalBoxX = tableX + tableAreaWidth - totalBoxW;
+  currentY += 3;
+  const totalBoxW = 70;
+  const totalBoxX = margin + contentWidth - totalBoxW;
   
-  drawGradientRect(pdf, totalBoxX, currentY, totalBoxW, 9, COLORS.green, [10, 120, 95], 8);
+  drawGradientRect(pdf, totalBoxX, currentY, totalBoxW, 10, COLORS.green, [10, 120, 95], 8);
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(6);
+  pdf.setFontSize(7);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.text('TOTAL VENTA', totalBoxX + 3, currentY + 4);
+  pdf.text('TOTAL VENTA', totalBoxX + 3, currentY + 4.5);
   
-  pdf.setFontSize(9);
-  pdf.text(formatCurrency(pedido.totalVenta), totalBoxX + 3, currentY + 8);
+  pdf.setFontSize(10);
+  pdf.text(formatCurrency(pedido.totalVenta), totalBoxX + 3, currentY + 9);
 
-  // ============ QR CODE (lado derecho) ============
-  const qrSize = 26;
-  const qrX = margin + contentWidth - qrSize - 1;
-  const qrY = tableStartY - 1;
+  currentY += 13;
+
+  // ============ QR CODE ============
+  const qrSize = 30;
+  const qrX = margin + contentWidth - qrSize;
+  const qrY = currentY;
   
-  // Fondo del QR con borde
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   pdf.roundedRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 12, 2, 2, 'F');
   pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
@@ -357,81 +359,76 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   try {
     const qrDataUrl = await generarQR(pedido.id);
     pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-  } catch {
+  } catch (e) {
+    // Si falla el QR, dibujar placeholder
     pdf.setDrawColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
     pdf.setLineWidth(0.5);
     pdf.roundedRect(qrX, qrY, qrSize, qrSize, 1, 1, 'S');
   }
   
-  // Etiqueta del QR
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(4.5);
+  pdf.setFontSize(5);
   pdf.setTextColor(COLORS.brand[0], COLORS.brand[1], COLORS.brand[2]);
   const qrLabel = `Pedido #${pedido.pedido}`;
-  const qrLabelW = pdf.getStringUnitWidth(qrLabel) * 4.5 / pdf.internal.scaleFactor;
+  const qrLabelW = pdf.getStringUnitWidth(qrLabel) * 5 / pdf.internal.scaleFactor;
   pdf.text(qrLabel, qrX + (qrSize - qrLabelW) / 2, qrY + qrSize + 6);
 
-  currentY += 12;
+  currentY += qrSize + 15;
 
   // ============ DETALLES DEL PEDIDO ============
   drawSectionTitle(pdf, margin, currentY, 'DETALLES DEL PEDIDO', COLORS.purple, COLORS.purpleBg, contentWidth);
-  currentY += 9;
+  currentY += 10;
 
-  const detailWidth = (contentWidth) / 2;
+  const detailWidth = contentWidth / 2;
 
-  // Pasarela - Card con borde púrpura
+  // Pasarela
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(margin, currentY, detailWidth - 3, 13, 2, 2, 'F');
+  pdf.roundedRect(margin, currentY, detailWidth - 2, 15, 2, 2, 'F');
   pdf.setDrawColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
   pdf.setLineWidth(0.5);
-  pdf.roundedRect(margin, currentY, detailWidth - 3, 13, 2, 2, 'S');
-  
-  // Barra superior púrpura
+  pdf.roundedRect(margin, currentY, detailWidth - 2, 15, 2, 2, 'S');
   pdf.setFillColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
-  pdf.roundedRect(margin, currentY, detailWidth - 3, 2.5, 2, 2, 'F');
+  pdf.roundedRect(margin, currentY, detailWidth - 2, 3, 2, 2, 'F');
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
-  pdf.text('PASARELA', margin + 3, currentY + 6);
+  pdf.text('PASARELA', margin + 3, currentY + 7);
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(6.5);
+  pdf.setFontSize(7);
   pdf.setTextColor(COLORS.slate[0], COLORS.slate[1], COLORS.slate[2]);
-  pdf.text(pedido.pasarela || '-', margin + 3, currentY + 10.5);
+  pdf.text(pedido.pasarela || '-', margin + 3, currentY + 12);
 
   // Outlet / Combo
   const checkboxX = margin + detailWidth;
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  pdf.roundedRect(checkboxX, currentY, detailWidth - 3, 13, 2, 2, 'F');
+  pdf.roundedRect(checkboxX, currentY, detailWidth - 2, 15, 2, 2, 'F');
   pdf.setDrawColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
   pdf.setLineWidth(0.5);
-  pdf.roundedRect(checkboxX, currentY, detailWidth - 3, 13, 2, 2, 'S');
-  
-  // Barra superior
+  pdf.roundedRect(checkboxX, currentY, detailWidth - 2, 15, 2, 2, 'S');
   pdf.setFillColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
-  pdf.roundedRect(checkboxX, currentY, detailWidth - 3, 2.5, 2, 2, 'F');
+  pdf.roundedRect(checkboxX, currentY, detailWidth - 2, 3, 2, 2, 'F');
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.purple[0], COLORS.purple[1], COLORS.purple[2]);
-  pdf.text('OUTLET', checkboxX + 3, currentY + 6);
-  pdf.text('COMBO', checkboxX + detailWidth / 2, currentY + 6);
+  pdf.text('OUTLET', checkboxX + 3, currentY + 7);
+  pdf.text('COMBO', checkboxX + detailWidth / 2, currentY + 7);
   
-  // Checkboxes
   pdf.setDrawColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
   pdf.setLineWidth(0.5);
-  pdf.roundedRect(checkboxX + 3, currentY + 8, 4, 4, 0.5, 0.5, 'S');
-  pdf.roundedRect(checkboxX + detailWidth / 2, currentY + 8, 4, 4, 0.5, 0.5, 'S');
+  pdf.roundedRect(checkboxX + 3, currentY + 9, 4, 4, 0.5, 0.5, 'S');
+  pdf.roundedRect(checkboxX + detailWidth / 2, currentY + 9, 4, 4, 0.5, 0.5, 'S');
 
-  currentY += 16;
+  currentY += 20;
 
   // ============ DILIGENCIAMIENTO OPERATIVO ============
   drawSectionTitle(pdf, margin, currentY, 'DILIGENCIAMIENTO OPERATIVO', COLORS.green, COLORS.greenBg, contentWidth);
-  currentY += 9;
+  currentY += 10;
 
   const opWidth = contentWidth / 3;
-  const remainingHeight = PAGE_HEIGHT - currentY - margin - 3;
-  const boxHeight = Math.min(remainingHeight, 28);
+  const remainingHeight = PAGE_HEIGHT - currentY - margin - 5;
+  const boxHeight = Math.min(remainingHeight, 35);
 
   // Factura
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
@@ -439,24 +436,22 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setDrawColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
   pdf.setLineWidth(0.5);
   pdf.roundedRect(margin, currentY, opWidth - 2, boxHeight, 2, 2, 'S');
-  // Barra superior verde
   pdf.setFillColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.roundedRect(margin, currentY, opWidth - 2, 2.5, 2, 2, 'F');
+  pdf.roundedRect(margin, currentY, opWidth - 2, 3, 2, 2, 'F');
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.text('FACTURA', margin + 3, currentY + 6);
+  pdf.text('FACTURA', margin + 3, currentY + 7);
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
-  pdf.text('N.________________________', margin + 3, currentY + 10);
+  pdf.text('N.________________________', margin + 3, currentY + 12);
 
-  // Líneas para escribir
   pdf.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
   pdf.setLineWidth(0.2);
-  for (let i = 0; i < 3; i++) {
-    pdf.line(margin + 3, currentY + 14 + i * 4.5, margin + opWidth - 5, currentY + 14 + i * 4.5);
+  for (let i = 0; i < 4; i++) {
+    pdf.line(margin + 3, currentY + 16 + i * 5, margin + opWidth - 5, currentY + 16 + i * 5);
   }
 
   // Observaciones
@@ -466,15 +461,15 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setLineWidth(0.5);
   pdf.roundedRect(margin + opWidth, currentY, opWidth - 2, boxHeight, 2, 2, 'S');
   pdf.setFillColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.roundedRect(margin + opWidth, currentY, opWidth - 2, 2.5, 2, 2, 'F');
+  pdf.roundedRect(margin + opWidth, currentY, opWidth - 2, 3, 2, 2, 'F');
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.text('OBSERVACIONES', margin + opWidth + 3, currentY + 6);
+  pdf.text('OBSERVACIONES', margin + opWidth + 3, currentY + 7);
 
-  for (let i = 0; i < 4; i++) {
-    pdf.line(margin + opWidth + 3, currentY + 10 + i * 4.5, margin + opWidth * 2 - 5, currentY + 10 + i * 4.5);
+  for (let i = 0; i < 5; i++) {
+    pdf.line(margin + opWidth + 3, currentY + 12 + i * 5, margin + opWidth * 2 - 5, currentY + 12 + i * 5);
   }
 
   // Proceso
@@ -484,25 +479,25 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setLineWidth(0.5);
   pdf.roundedRect(margin + opWidth * 2, currentY, opWidth - 2, boxHeight, 2, 2, 'S');
   pdf.setFillColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.roundedRect(margin + opWidth * 2, currentY, opWidth - 2, 2.5, 2, 2, 'F');
+  pdf.roundedRect(margin + opWidth * 2, currentY, opWidth - 2, 3, 2, 2, 'F');
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6);
   pdf.setTextColor(COLORS.green[0], COLORS.green[1], COLORS.green[2]);
-  pdf.text('PROCESO', margin + opWidth * 2 + 3, currentY + 6);
+  pdf.text('PROCESO', margin + opWidth * 2 + 3, currentY + 7);
 
-  for (let i = 0; i < 4; i++) {
-    pdf.line(margin + opWidth * 2 + 3, currentY + 10 + i * 4.5, margin + opWidth * 3 - 5, currentY + 10 + i * 4.5);
+  for (let i = 0; i < 5; i++) {
+    pdf.line(margin + opWidth * 2 + 3, currentY + 12 + i * 5, margin + opWidth * 3 - 5, currentY + 12 + i * 5);
   }
 
   // ============ FOOTER ============
-  drawGradientRect(pdf, margin, PAGE_HEIGHT - 4, contentWidth, 1.5, COLORS.brand, COLORS.green, 4);
+  drawGradientRect(pdf, margin, PAGE_HEIGHT - 5, contentWidth, 2, COLORS.brand, COLORS.green, 4);
   
   pdf.setFont('helvetica', 'italic');
-  pdf.setFontSize(4);
+  pdf.setFontSize(4.5);
   pdf.setTextColor(COLORS.gray[0], COLORS.gray[1], COLORS.gray[2]);
-  pdf.text('Refurbi - Dando segundas oportunidades', margin + 2, PAGE_HEIGHT - 1.5);
-  pdf.text(`Generado: ${new Date().toLocaleDateString('es-CO')}`, PAGE_WIDTH - margin - 28, PAGE_HEIGHT - 1.5);
+  pdf.text('Refurbi - Dando segundas oportunidades', margin + 2, PAGE_HEIGHT - 2);
+  pdf.text(`Generado: ${new Date().toLocaleDateString('es-CO')}`, PAGE_WIDTH - margin - 32, PAGE_HEIGHT - 2);
 }
 
 /**
@@ -510,7 +505,7 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
  */
 export async function generarPDFPedido(pedido: Pedido): Promise<jsPDF> {
   const pdf = new jsPDF({
-    orientation: 'landscape',
+    orientation: 'portrait',
     unit: 'mm',
     format: [PAGE_WIDTH, PAGE_HEIGHT]
   });
@@ -520,20 +515,20 @@ export async function generarPDFPedido(pedido: Pedido): Promise<jsPDF> {
 }
 
 /**
- * Genera un PDF consolidado con todos los pedidos (uno por página)
+ * Genera un PDF consolidado con todos los pedidos
  */
 export async function generarPDFConsolidado(pedidos: Pedido[]): Promise<jsPDF> {
   if (pedidos.length === 0) throw new Error('No hay pedidos para generar');
 
   const pdf = new jsPDF({
-    orientation: 'landscape',
+    orientation: 'portrait',
     unit: 'mm',
     format: [PAGE_WIDTH, PAGE_HEIGHT]
   });
 
   for (let i = 0; i < pedidos.length; i++) {
     if (i > 0) {
-      pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT], 'landscape');
+      pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT], 'portrait');
     }
     await dibujarPaginaPedido(pdf, pedidos[i]);
   }

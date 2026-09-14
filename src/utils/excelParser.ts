@@ -20,6 +20,12 @@ function limpiarValor(valor: string | number | undefined | null): string {
   return String(valor).trim();
 }
 
+function parseNumber(value: string | number): number {
+  if (typeof value === 'number') return value;
+  const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+  return isNaN(num) ? 0 : num;
+}
+
 function formatearFecha(fecha: string | number): string {
   if (!fecha) return '';
   
@@ -127,7 +133,12 @@ export function parsearExcel(buffer: ArrayBuffer): ResultadoValidacion {
     // Agrupar por número de pedido
     if (pedidosMap.has(pedidoNum)) {
       // Agregar producto al pedido existente
-      pedidosMap.get(pedidoNum)!.productos.push(producto);
+      const pedidoExistente = pedidosMap.get(pedidoNum)!;
+      pedidoExistente.productos.push(producto);
+      
+      // Sumar el total de venta del nuevo producto
+      const nuevoTotal = parseNumber(pedidoExistente.totalVenta) + parseNumber(producto.totalVenta);
+      pedidoExistente.totalVenta = nuevoTotal;
     } else {
       // Crear nuevo pedido
       const pedido: Pedido = {

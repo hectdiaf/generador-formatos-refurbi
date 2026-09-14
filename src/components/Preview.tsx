@@ -91,10 +91,14 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
 
   const handleDownloadSingle = async () => {
     try {
+      console.log('Iniciando generación de PDF para pedido:', pedido.pedido);
       const pdf = await generarPDFPedido(pedido);
+      console.log('PDF generado, guardando...');
       pdf.save(`${pedido.pedido}.pdf`);
+      console.log('PDF guardado exitosamente');
     } catch (err) {
-      console.error(err);
+      console.error('Error al generar PDF:', err);
+      alert(`Error al generar el PDF: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
@@ -138,7 +142,7 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
         </div>
         
         <div className="p-4 bg-gray-50 flex justify-center overflow-auto">
-          <div className="bg-white shadow-lg border" style={{ width: '680px', minHeight: '440px' }}>
+          <div className="bg-white shadow-lg border" style={{ width: '440px', minHeight: '680px' }}>
             {/* Encabezado */}
             <div className="bg-gradient-to-r from-[#023047] to-[#034E71] px-4 py-2.5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
