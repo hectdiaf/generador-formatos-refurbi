@@ -69,5 +69,5 @@ export interface HistorialEntry {
   sku: string;
   total: string | number;
   fechaGeneracion: string;
-  data: Pedido; // Datos completos para reimprimir
+  p: Pedido; // Datos completos para reimprimir
 }

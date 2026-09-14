@@ -49,7 +49,7 @@ export default function History() {
   const handleDownloadPdf = async (entry: HistorialEntry) => {
     setIsGeneratingPdf(true);
     try {
-      const pdf = await generarPDFPedido(entry.data);
+      const pdf = await generarPDFPedido(entry.p);
       pdf.save(`${entry.pedido}.pdf`);
     } catch (err) {
       console.error('Error al generar PDF:', err);
@@ -60,7 +60,7 @@ export default function History() {
 
   const handlePrint = async (entry: HistorialEntry) => {
     try {
-      const pdf = await generarPDFPedido(entry.data);
+      const pdf = await generarPDFPedido(entry.p);
       const pdfBlob = pdf.output('blob');
       const url = URL.createObjectURL(pdfBlob);
       window.open(url, '_blank');
@@ -220,41 +220,41 @@ export default function History() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Pedido</p>
-                      <p className="font-semibold text-slate-800">#{entry.data.pedido}</p>
+                      <p className="font-semibold text-slate-800">#{entry.p.pedido}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Canal</p>
-                      <p className="font-semibold">{entry.data.mkp}</p>
+                      <p className="font-semibold">{entry.p.mkp}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Cliente</p>
-                      <p className="font-semibold">{entry.data.nombre}</p>
+                      <p className="font-semibold">{entry.p.nombre}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Cédula</p>
-                      <p className="font-semibold">{entry.data.cedula}</p>
+                      <p className="font-semibold">{entry.p.cedula}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Celular</p>
-                      <p className="font-semibold">{entry.data.celular}</p>
+                      <p className="font-semibold">{entry.p.celular}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Pasarela</p>
-                      <p className="font-semibold">{entry.data.pasarela}</p>
+                      <p className="font-semibold">{entry.p.pasarela}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Fecha</p>
-                      <p className="font-semibold">{entry.data.fecha}</p>
+                      <p className="font-semibold">{entry.p.fecha}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs font-medium">Generado</p>
-                      <p className="font-semibold">{new Date(entry.data.fechaGeneracion).toLocaleDateString('es-CO')}</p>
+                      <p className="font-semibold">{new Date(entry.p.fechaGeneracion).toLocaleDateString('es-CO')}</p>
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <p className="text-gray-400 text-xs font-medium mb-1">Productos:</p>
                     <div className="flex flex-wrap gap-1">
-                      {entry.data.productos.map((prod, i) => (
+                      {entry.p.productos.map((prod: { sku: string }, i: number) => (
                         <span key={i} className="text-xs font-mono bg-white px-2 py-0.5 rounded border border-gray-200 text-slate-600">{prod.sku}</span>
                       ))}
                     </div>
