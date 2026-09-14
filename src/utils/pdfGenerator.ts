@@ -118,20 +118,22 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
 
   // ============ CALCULAR ESPACIOS DINÁMICOS ============
   const numProductos = pedido.productos.length;
-  const headerHeight = 20; // reducido de 22
-  const datosClienteHeight = 18; // reducido de 21
-  const detallesPedidoHeight = 20; // reducido de 22
-  const diligenciamientoHeight = 22; // reducido de 25
-  const gaps = 8; // reducido de 12
-  const bottomMargin = 5; // margen inferior mínimo
+  const headerHeight = 20;
+  const datosClienteHeight = 15; // título (7) + datos (12) - 4
+  const detallesPedidoHeight = 16; // título (7) + contenido (13) - 4
+  const diligenciamientoHeight = 20; // título (7) + cajas (13)
+  const gaps = 4; // espacios mínimos entre secciones
+  const bottomMargin = 3; // margen inferior mínimo
   
-  // Espacio total disponible para la tabla de productos
-  const totalFixedHeight = headerHeight + datosClienteHeight + detallesPedidoHeight + diligenciamientoHeight + gaps + bottomMargin;
+  // Espacio total fijo (sin contar la tabla)
+  const totalFixedHeight = headerHeight + datosClienteHeight + detallesPedidoHeight + diligenciamientoHeight + (gaps * 4) + bottomMargin;
   const availableForTable = PAGE_HEIGHT - currentY - totalFixedHeight;
   
-  // Calcular alto de fila: mínimo 10mm para que quepa texto de 9pt cómodamente
-  const minRowHeight = 10;
-  const rowHeight = Math.max(minRowHeight, availableForTable / (numProductos + 1)); // +1 por el encabezado
+  // Calcular alto de fila dinámico
+  // Mínimo 8mm para texto de 9pt, máximo 12mm
+  const minRowHeight = 8;
+  const maxRowHeight = 12;
+  const rowHeight = Math.min(maxRowHeight, Math.max(minRowHeight, availableForTable / (numProductos + 1)));
 
   // ============ ENCABEZADO ============
   drawGradientRect(pdf, 0, 0, PAGE_WIDTH, headerHeight, COLORS.brand, COLORS.brandLight, 8);
@@ -270,7 +272,7 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
   pdf.text(String(pedido.celular), sectionX + colWidth * 2 + 2, currentY + 8);
 
-  currentY += 13;
+  currentY += 10;
 
   // DETALLE DEL PRODUCTO
   drawSectionTitle(pdf, sectionX, currentY, 'DETALLE DEL PRODUCTO', COLORS.section, COLORS.sectionBg, sectionWidth);
@@ -370,7 +372,7 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   pdf.setFontSize(9);
   pdf.text(formatCurrency(pedido.totalVenta), totalBoxX + 3, currentY + 8);
 
-  currentY += 10;
+  currentY += 8;
 
   // DETALLES DEL PEDIDO
   drawSectionTitle(pdf, sectionX, currentY, 'DETALLES DEL PEDIDO', COLORS.section, COLORS.sectionBg, sectionWidth);
@@ -423,14 +425,15 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     pdf.roundedRect(checkboxX + 2.5, currentY + 8.5, 2.5, 2.5, 0.3, 0.3, 'F');
   }
 
-  currentY += 14;
+  currentY += 11;
 
   // DILIGENCIAMIENTO OPERATIVO
   drawSectionTitle(pdf, sectionX, currentY, 'DILIGENCIAMIENTO OPERATIVO', COLORS.accent, COLORS.accentBg, sectionWidth);
   currentY += 7;
 
   const opWidth = sectionWidth / 3;
-  const opHeight = PAGE_HEIGHT - currentY - margin - 5; // dejar espacio en blanco abajo
+  // Calcular altura disponible para las cajas de diligenciamiento
+  const opHeight = Math.min(25, PAGE_HEIGHT - currentY - margin - 3); // máximo 25mm, dejar 3mm abajo
 
   // Factura
   pdf.setFillColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);

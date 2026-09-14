@@ -304,13 +304,6 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
                 </div>
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="h-1 bg-gradient-to-r from-[#023047] to-emerald-600"></div>
-            <div className="px-3 py-0.5 flex justify-between">
-              <p className="text-[7px] text-gray-400 italic">Refurbi - Dando segundas oportunidades</p>
-              <p className="text-[7px] text-gray-400">Generado: {new Date().toLocaleDateString('es-CO')}</p>
-            </div>
           </div>
         </div>
       </div>
