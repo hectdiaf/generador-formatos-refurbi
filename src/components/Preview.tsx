@@ -144,162 +144,151 @@ export default function Preview({ pedidos, onReset }: PreviewProps) {
         <div className="p-4 bg-gray-50 flex justify-center overflow-auto">
           <div className="bg-white shadow-lg border" style={{ width: '680px', minHeight: '440px' }}>
             {/* Encabezado */}
-            <div className="bg-gradient-to-r from-[#023047] to-[#034E71] px-4 py-2.5 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-[#023047] to-[#034E71] px-3 py-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  {/* Logo 3 círculos */}
-                  <div className="flex -space-x-1.5">
-                    <div className="w-3.5 h-3.5 bg-white/80 rounded-full"></div>
-                    <div className="w-3.5 h-3.5 bg-white/80 rounded-full"></div>
-                    <div className="w-3.5 h-3.5 bg-white/80 rounded-full"></div>
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    {/* Logo 3 círculos */}
+                    <div className="flex -space-x-1">
+                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
+                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
+                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full"></div>
+                    </div>
+                    <p className="text-white font-bold text-xs tracking-wide">REFURBI</p>
                   </div>
-                  <div>
-                    <p className="text-white font-bold text-sm tracking-wide">REFURBI</p>
-                    <p className="text-blue-200 text-[8px] italic leading-tight">Las segundas oportunidades no son solo para las personas.</p>
-                  </div>
-                  <div className="ml-3 flex items-center gap-1">
-                    <p className="text-white font-bold text-[10px]">Formato de remisión de pedidos</p>
-                    <span className="bg-white text-[#023047] text-[7px] px-1.5 py-0.5 rounded-full font-bold">Ecommerce / Marketplace</span>
-                  </div>
+                  <p className="text-blue-200 text-[7px] italic leading-tight mb-1">Las segundas oportunidades no son solo para las personas.</p>
+                  <p className="text-white font-bold text-[9px]">Formato de remisión de pedidos</p>
+                  <p className="text-blue-100 font-bold text-[8px] mt-0.5">{pedido.mkp}  |  {pedido.fecha}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   {qrImage && (
-                    <div className="bg-white rounded-md p-0.5">
-                      <img src={qrImage} alt="QR" className="w-12 h-12" />
+                    <div className="bg-white rounded p-0.5">
+                      <img src={qrImage} alt="QR" className="w-8 h-8" />
                     </div>
                   )}
-                  <div className="bg-white/15 rounded-lg px-3 py-1 text-right">
-                    <p className="text-blue-200 text-[8px]">PEDIDO</p>
-                    <p className="text-white font-bold text-xl leading-tight">{pedido.pedido}</p>
-                    <p className="text-blue-200 text-[8px]">{pedido.mkp} | {pedido.fecha}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Datos del Cliente */}
-            <div className="mx-3 mt-2">
-              <div className="bg-blue-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-blue-600">
-                <p className="text-blue-700 font-bold text-[10px]">DATOS DEL CLIENTE</p>
-              </div>
-              <div className="grid grid-cols-3 gap-1.5 mt-1">
-                <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                  <p className="text-gray-400 text-[8px]">NOMBRE</p>
-                  <p className="text-slate-800 font-bold text-[10px]">{pedido.nombre.toUpperCase()}</p>
-                </div>
-                <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                  <p className="text-gray-400 text-[8px]">C.C.</p>
-                  <p className="text-slate-800 font-bold text-[10px]">{pedido.cedula}</p>
-                </div>
-                <div className="bg-white border border-gray-200 rounded-md p-1.5">
-                  <p className="text-gray-400 text-[8px]">CELULAR</p>
-                  <p className="text-slate-800 font-bold text-[10px]">{pedido.celular}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Detalle del producto */}
-            <div className="mx-3 mt-2">
-              <div className="bg-orange-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-orange-500">
-                <p className="text-orange-600 font-bold text-[10px]">DETALLE DEL PRODUCTO</p>
-              </div>
-              <div className="border border-[#023047] rounded-b-md overflow-hidden mt-0">
-                <table className="w-full text-[9px]">
-                  <thead>
-                    <tr className="bg-gradient-to-r from-[#023047] to-[#034E71] text-white">
-                      <th className="px-1.5 py-1 text-left font-medium">SKU</th>
-                      <th className="px-1.5 py-1 text-right font-medium">PRECIO BASE</th>
-                      <th className="px-1.5 py-1 text-right font-medium">PANEL</th>
-                      <th className="px-1.5 py-1 text-right font-medium">GAR. A.I</th>
-                      <th className="px-1.5 py-1 text-right font-medium">GAR. TOTAL</th>
-                      <th className="px-1.5 py-1 text-right font-medium">TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pedido.productos.map((prod, i) => (
-                      <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-1.5 py-1 font-mono text-[#023047] font-bold">{prod.sku}</td>
-                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.base)}</td>
-                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.panel)}</td>
-                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaAI)}</td>
-                        <td className="px-1.5 py-1 text-right text-slate-600">{formatCurrency(prod.garantiaTotal)}</td>
-                        <td className="px-1.5 py-1 text-right font-medium text-slate-800">{formatCurrency(prod.totalVenta)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="flex justify-end mt-1">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 py-1 rounded-md">
-                  <span className="text-[9px] font-bold">TOTAL VENTA </span>
-                  <span className="text-xs font-bold">{formatCurrency(pedido.totalVenta)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Detalles del pedido */}
-            <div className="mx-3 mt-2">
-              <div className="bg-purple-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-purple-600">
-                <p className="text-purple-700 font-bold text-[10px]">DETALLES DEL PEDIDO</p>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5 mt-1">
-                <div className="bg-white border border-purple-300 rounded-md p-1.5 border-t-2 border-t-purple-600">
-                  <p className="text-purple-700 font-bold text-[9px]">PASARELA</p>
-                  <p className="text-slate-700 text-[10px] mt-0.5">{pedido.pasarela || '-'}</p>
-                </div>
-                <div className="bg-white border border-purple-300 rounded-md p-1.5 border-t-2 border-t-purple-600 flex gap-4">
-                  <div>
-                    <p className="text-purple-700 font-bold text-[9px]">OUTLET</p>
-                    <div className={`w-3.5 h-3.5 border-2 rounded mt-0.5 flex items-center justify-center ${
-                      pedido.outlet ? 'border-[#023047] bg-[#023047]' : 'border-gray-300'
-                    }`}>
-                      {pedido.outlet && (
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                  <div className="bg-white/15 rounded-lg px-2 py-1 text-right">
+                    <p className="text-blue-200 text-[7px]">PEDIDO</p>
+                    <p className="text-white font-bold text-lg leading-tight">{pedido.pedido}</p>
+                    {/* Código de barras simulado */}
+                    <div className="mt-1 flex gap-px">
+                      {Array.from({ length: 20 }).map((_, i) => (
+                        <div key={i} className="bg-white" style={{ width: '1px', height: '6px' }}></div>
+                      ))}
                     </div>
                   </div>
-                  <div>
-                    <p className="text-purple-700 font-bold text-[9px]">COMBO</p>
-                    <div className="w-3.5 h-3.5 border-2 border-gray-300 rounded mt-0.5"></div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Diligenciamiento operativo */}
-            <div className="mx-3 mt-2 mb-2">
-              <div className="bg-emerald-50 rounded-t-md px-3 py-1 flex items-center gap-2 border-l-4 border-emerald-600">
-                <p className="text-emerald-700 font-bold text-[10px]">DILIGENCIAMIENTO OPERATIVO</p>
+            {/* Layout 2x2 */}
+            <div className="grid grid-cols-2 gap-2 p-2">
+              {/* Arriba Izquierda: Datos del Cliente */}
+              <div>
+                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-600">
+                  <p className="text-blue-700 font-bold text-[9px]">DATOS DEL CLIENTE</p>
+                </div>
+                <div className="space-y-1 mt-1">
+                  <div className="bg-white border border-gray-200 rounded-md p-1.5">
+                    <p className="text-gray-400 text-[7px]">NOMBRE</p>
+                    <p className="text-slate-800 font-bold text-[9px]">{pedido.nombre.toUpperCase()}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1">
+                    <div className="bg-white border border-gray-200 rounded-md p-1.5">
+                      <p className="text-gray-400 text-[7px]">C.C.</p>
+                      <p className="text-slate-800 font-bold text-[9px]">{pedido.cedula}</p>
+                    </div>
+                    <div className="bg-white border border-gray-200 rounded-md p-1.5">
+                      <p className="text-gray-400 text-[7px]">CELULAR</p>
+                      <p className="text-slate-800 font-bold text-[9px]">{pedido.celular}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-1.5 mt-1">
-                <div className="bg-white border border-emerald-300 rounded-md p-1.5 h-14 border-t-2 border-t-emerald-600">
-                  <p className="text-emerald-700 font-bold text-[9px]">FACTURA</p>
-                  <p className="text-[8px] text-gray-300 mt-0.5">N.________________________</p>
-                  <div className="mt-1.5 space-y-1.5">
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
+
+              {/* Arriba Derecha: Detalle del Producto */}
+              <div>
+                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-700">
+                  <p className="text-blue-800 font-bold text-[9px]">DETALLE DEL PRODUCTO</p>
+                </div>
+                <div className="border border-[#023047] rounded-b-md overflow-hidden mt-1">
+                  <table className="w-full text-[8px]">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-[#023047] to-[#034E71] text-white">
+                        <th className="px-1 py-0.5 text-left font-medium">SKU</th>
+                        <th className="px-1 py-0.5 text-right font-medium">BASE</th>
+                        <th className="px-1 py-0.5 text-right font-medium">PANEL</th>
+                        <th className="px-1 py-0.5 text-right font-medium">G.A.I</th>
+                        <th className="px-1 py-0.5 text-right font-medium">G.TOT</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pedido.productos.map((prod, i) => (
+                        <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-1 py-0.5 font-mono text-[#023047] font-bold text-[7px]">{prod.sku}</td>
+                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.base)}</td>
+                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.panel)}</td>
+                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.garantiaAI)}</td>
+                          <td className="px-1 py-0.5 text-right text-slate-600 text-[7px]">{formatCurrency(prod.garantiaTotal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex justify-end mt-1">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-2 py-0.5 rounded">
+                    <span className="text-[8px] font-bold">TOTAL </span>
+                    <span className="text-[9px] font-bold">{formatCurrency(pedido.totalVenta)}</span>
                   </div>
                 </div>
-                <div className="bg-white border border-emerald-300 rounded-md p-1.5 h-14 border-t-2 border-t-emerald-600">
-                  <p className="text-emerald-700 font-bold text-[9px]">OBSERVACIONES</p>
-                  <div className="mt-1.5 space-y-1.5">
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
+              </div>
+
+              {/* Abajo Izquierda: Detalles del Pedido */}
+              <div>
+                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-700">
+                  <p className="text-blue-800 font-bold text-[9px]">DETALLES DEL PEDIDO</p>
+                </div>
+                <div className="grid grid-cols-2 gap-1 mt-1">
+                  <div className="bg-white border border-blue-300 rounded-md p-1.5 border-t-2 border-t-blue-700">
+                    <p className="text-blue-800 font-bold text-[8px]">PASARELA</p>
+                    <p className="text-slate-700 text-[8px] mt-0.5">{pedido.pasarela || '-'}</p>
+                  </div>
+                  <div className="bg-white border border-blue-300 rounded-md p-1.5 border-t-2 border-t-blue-700 flex gap-2">
+                    <div>
+                      <p className="text-blue-800 font-bold text-[8px]">OUTLET</p>
+                      <div className={`w-3 h-3 border-2 rounded mt-0.5 flex items-center justify-center ${
+                        pedido.outlet ? 'border-[#023047] bg-[#023047]' : 'border-gray-300'
+                      }`}>
+                        {pedido.outlet && (
+                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-blue-800 font-bold text-[8px]">COMBO</p>
+                      <div className="w-3 h-3 border-2 border-gray-300 rounded mt-0.5"></div>
+                    </div>
                   </div>
                 </div>
-                <div className="bg-white border border-emerald-300 rounded-md p-1.5 h-14 border-t-2 border-t-emerald-600">
-                  <p className="text-emerald-700 font-bold text-[9px]">PROCESO</p>
-                  <div className="mt-1.5 space-y-1.5">
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
-                    <div className="h-px bg-gray-100"></div>
+              </div>
+
+              {/* Abajo Derecha: Diligenciamiento Operativo */}
+              <div>
+                <div className="bg-blue-50 rounded-t-md px-2 py-0.5 flex items-center gap-1 border-l-2 border-blue-500">
+                  <p className="text-blue-600 font-bold text-[9px]">DILIGENCIAMIENTO OPERATIVO</p>
+                </div>
+                <div className="grid grid-cols-3 gap-1 mt-1">
+                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
+                    <p className="text-blue-600 font-bold text-[8px]">FACTURA</p>
+                    <p className="text-[7px] text-gray-300 mt-0.5">N.____________</p>
+                  </div>
+                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
+                    <p className="text-blue-600 font-bold text-[8px]">OBSERVACIONES</p>
+                  </div>
+                  <div className="bg-white border border-blue-300 rounded-md p-1 border-t-2 border-t-blue-500 h-12">
+                    <p className="text-blue-600 font-bold text-[8px]">PROCESO</p>
                   </div>
                 </div>
               </div>
