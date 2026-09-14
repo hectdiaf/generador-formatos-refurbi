@@ -201,6 +201,16 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
   const sectionWidth = contentWidth;
   const sectionX = margin;
 
+  // Calcular espacio disponible dinámicamente
+  const fixedSectionsHeight = 9 + 12 + 3 + 9 + 9 + 13 + 3 + 9 + 3 + 5; // títulos + datos + gaps
+  const availableHeight = PAGE_HEIGHT - currentY - margin - 5; // margen inferior
+  const tableAvailableHeight = availableHeight - fixedSectionsHeight;
+  
+  // Calcular alto de fila dinámico según número de productos
+  const numProductos = pedido.productos.length;
+  const headerRowHeight = 6;
+  const rowHeight = Math.max(4, Math.min(6, (tableAvailableHeight - headerRowHeight - 11) / numProductos)); // mínimo 4mm, máximo 6mm
+
   // DATOS DEL CLIENTE
   drawSectionTitle(pdf, sectionX, currentY, 'DATOS DEL CLIENTE', COLORS.blue, COLORS.blueBg, sectionWidth);
   currentY += 9;
@@ -270,33 +280,36 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
     { label: 'TOTAL', width: sectionWidth * 0.15, align: 'right' as const }
   ];
 
-  const rowHeight = 6;
+  // Calcular tamaño de fuente dinámico según alto de fila
+  const fontSize = Math.max(4.5, Math.min(6, rowHeight * 0.9));
+  const textOffsetY = rowHeight / 2 + 1; // centrar texto verticalmente
 
   // Encabezados
   drawGradientRect(pdf, sectionX, currentY, sectionWidth, rowHeight, COLORS.brand, COLORS.brandLight, 6);
   
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(6);
+  pdf.setFontSize(fontSize);
   pdf.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
   
   let colX = sectionX;
   cols.forEach(col => {
-    const textW = pdf.getStringUnitWidth(col.label) * 6 / pdf.internal.scaleFactor;
+    const textW = pdf.getStringUnitWidth(col.label) * fontSize / pdf.internal.scaleFactor;
     const textX = col.align === 'right' ? colX + col.width - textW - 1.5 : colX + 1.5;
-    pdf.text(col.label, textX, currentY + 4);
+    pdf.text(col.label, textX, currentY + textOffsetY);
     colX += col.width;
   });
   
   currentY += rowHeight;
 
   // Filas
+  
   pedido.productos.forEach((producto, index) => {
     const bgColor = index % 2 === 0 ? COLORS.white : COLORS.grayLight;
     pdf.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
     pdf.rect(sectionX, currentY, sectionWidth, rowHeight, 'F');
     
     pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(6);
+    pdf.setFontSize(fontSize);
     pdf.setTextColor(COLORS.slate[0], COLORS.slate[1], COLORS.slate[2]);
     
     colX = sectionX;
@@ -319,10 +332,10 @@ async function dibujarPaginaPedido(pdf: jsPDF, pedido: Pedido): Promise<void> {
       }
       
       if (col.align === 'right') {
-        const textW = pdf.getStringUnitWidth(values[i]) * 6 / pdf.internal.scaleFactor;
-        pdf.text(values[i], colX + col.width - textW - 1.5, currentY + 4);
+        const textW = pdf.getStringUnitWidth(values[i]) * fontSize / pdf.internal.scaleFactor;
+        pdf.text(values[i], colX + col.width - textW - 1.5, currentY + textOffsetY);
       } else {
-        pdf.text(values[i], colX + 1.5, currentY + 4);
+        pdf.text(values[i], colX + 1.5, currentY + textOffsetY);
       }
       colX += col.width;
     });
