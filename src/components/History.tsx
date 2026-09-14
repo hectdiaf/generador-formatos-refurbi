@@ -1,5 +1,5 @@
 // ============================================================
-// Componente de Historial - Búsqueda y reimpresión de pedidos
+// Componente de Historial - Diseño moderno
 // ============================================================
 
 import { useState, useEffect } from 'react';
@@ -78,7 +78,9 @@ export default function History() {
   return (
     <div className="w-full max-w-5xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-[#1B2B5B] mb-2">Historial de Pedidos</h2>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#1E40AF] to-[#2563EB] bg-clip-text text-transparent mb-2">
+          📋 Historial de Pedidos
+        </h2>
         <p className="text-gray-500">Busca, visualiza y reimprime pedidos anteriores</p>
       </div>
 
@@ -94,31 +96,39 @@ export default function History() {
           placeholder="Buscar por pedido, nombre, cédula, celular, SKU, canal o fecha..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent outline-none transition-all shadow-sm"
+          className="w-full pl-12 pr-10 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-sm placeholder:text-gray-400"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
             className="absolute inset-y-0 right-0 pr-4 flex items-center"
           >
-            <svg className="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+              <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
           </button>
         )}
       </div>
 
       {/* Resultados */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-[#1B2B5B] border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative">
+            <div className="w-12 h-12 border-4 border-blue-100 rounded-full"></div>
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <p className="text-gray-400 mt-4 text-sm">Cargando historial...</p>
         </div>
       ) : entries.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-xl">
-          <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p className="text-gray-500 text-lg">
+        <div className="text-center py-16 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/50 shadow-sm">
+          <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <p className="text-gray-600 text-lg font-medium">
             {searchQuery ? 'No se encontraron resultados' : 'No hay pedidos en el historial'}
           </p>
           <p className="text-gray-400 text-sm mt-1">
@@ -130,35 +140,35 @@ export default function History() {
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className={`bg-white rounded-xl border transition-all ${
+              className={`bg-white/80 backdrop-blur-sm rounded-xl border transition-all hover:shadow-md ${
                 selectedEntry?.id === entry.id
-                  ? 'border-[#4A90D9] shadow-md ring-1 ring-[#4A90D9]'
-                  : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                  ? 'border-blue-300 shadow-lg ring-2 ring-blue-100'
+                  : 'border-gray-200/50 shadow-sm'
               }`}
             >
               <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#1B2B5B] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-sm">{entry.pedido.slice(-3)}</span>
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-200">
+                    <span className="text-white font-bold text-sm">#{entry.pedido.slice(-3)}</span>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1B2B5B]">Pedido #{entry.pedido}</span>
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{entry.canal}</span>
+                      <span className="font-bold text-slate-800">Pedido #{entry.pedido}</span>
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">{entry.canal}</span>
                     </div>
-                    <p className="text-sm text-gray-600">{entry.nombre}</p>
+                    <p className="text-sm text-gray-600 mt-0.5">{entry.nombre}</p>
                     <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
                       <span>C.C. {entry.cedula}</span>
-                      <span>•</span>
+                      <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                       <span>{entry.celular}</span>
-                      <span>•</span>
-                      <span>{entry.sku}</span>
+                      <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                      <span className="font-mono">{entry.sku.substring(0, 20)}{entry.sku.length > 20 ? '...' : ''}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-2">
-                    <p className="font-bold text-[#1B2B5B]">{typeof entry.total === 'number' ? `$${entry.total.toLocaleString('es-CO')}` : entry.total}</p>
+                    <p className="font-bold text-slate-800">{typeof entry.total === 'number' ? `$${entry.total.toLocaleString('es-CO')}` : entry.total}</p>
                     <p className="text-xs text-gray-400">{entry.fecha}</p>
                   </div>
                   <div className="flex gap-1">
@@ -175,7 +185,7 @@ export default function History() {
                     <button
                       onClick={() => handleDownloadPdf(entry)}
                       disabled={isGeneratingPdf}
-                      className="p-2 rounded-lg hover:bg-green-50 text-green-600 transition-colors disabled:opacity-50"
+                      className="p-2 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors disabled:opacity-50"
                       title="Descargar PDF"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,46 +216,48 @@ export default function History() {
 
               {/* Detalle expandible */}
               {selectedEntry?.id === entry.id && (
-                <div className="border-t border-gray-100 p-4 bg-gray-50">
+                <div className="border-t border-gray-100 p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500 text-xs">Pedido</p>
-                      <p className="font-medium text-[#1B2B5B]">#{entry.data.pedido}</p>
+                      <p className="text-gray-400 text-xs font-medium">Pedido</p>
+                      <p className="font-semibold text-slate-800">#{entry.data.pedido}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Canal</p>
-                      <p className="font-medium">{entry.data.mkp}</p>
+                      <p className="text-gray-400 text-xs font-medium">Canal</p>
+                      <p className="font-semibold">{entry.data.mkp}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Cliente</p>
-                      <p className="font-medium">{entry.data.nombre}</p>
+                      <p className="text-gray-400 text-xs font-medium">Cliente</p>
+                      <p className="font-semibold">{entry.data.nombre}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Cédula</p>
-                      <p className="font-medium">{entry.data.cedula}</p>
+                      <p className="text-gray-400 text-xs font-medium">Cédula</p>
+                      <p className="font-semibold">{entry.data.cedula}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Celular</p>
-                      <p className="font-medium">{entry.data.celular}</p>
+                      <p className="text-gray-400 text-xs font-medium">Celular</p>
+                      <p className="font-semibold">{entry.data.celular}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Pasarela</p>
-                      <p className="font-medium">{entry.data.pasarela}</p>
+                      <p className="text-gray-400 text-xs font-medium">Pasarela</p>
+                      <p className="font-semibold">{entry.data.pasarela}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Fecha</p>
-                      <p className="font-medium">{entry.data.fecha}</p>
+                      <p className="text-gray-400 text-xs font-medium">Fecha</p>
+                      <p className="font-semibold">{entry.data.fecha}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Generado</p>
-                      <p className="font-medium">{new Date(entry.data.fechaGeneracion).toLocaleDateString('es-CO')}</p>
+                      <p className="text-gray-400 text-xs font-medium">Generado</p>
+                      <p className="font-semibold">{new Date(entry.data.fechaGeneracion).toLocaleDateString('es-CO')}</p>
                     </div>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-gray-500 text-xs mb-1">Productos:</p>
-                    {entry.data.productos.map((prod, i) => (
-                      <p key={i} className="text-xs font-mono text-gray-600">{prod.sku}</p>
-                    ))}
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-gray-400 text-xs font-medium mb-1">Productos:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {entry.data.productos.map((prod, i) => (
+                        <span key={i} className="text-xs font-mono bg-white px-2 py-0.5 rounded border border-gray-200 text-slate-600">{prod.sku}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -256,7 +268,7 @@ export default function History() {
 
       {/* Contador */}
       {!isLoading && entries.length > 0 && (
-        <p className="text-center text-sm text-gray-400 mt-4">
+        <p className="text-center text-sm text-gray-400 mt-6">
           {entries.length} registro{entries.length !== 1 ? 's' : ''} encontrado{entries.length !== 1 ? 's' : ''}
         </p>
       )}
